@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace VS2019CSharpGV472
 {
@@ -18,7 +19,27 @@ namespace VS2019CSharpGV472
 
             if (!IsPostBack) {
                 // put some data in the existing grid view
+                using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TravelDB;Integrated Security=True;"))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("Select * from tblTravelTypes Order by TravelType", conn);
+                    SqlDataReader dr = cmd.ExecuteReader();
 
+                    // to get the number of rows the reader has load it into a table
+                    DataTable dt = new DataTable();
+                    dt.Load(dr);
+                    int numRows = dt.Rows.Count;
+                    
+                    // scope the array variable that holds the Travel Types for the dropdown
+                    _travelTypes = new string[numRows];
+
+                    // fill the array with the types
+                    foreach (DataRow row in dt.Rows)
+					{
+                        // use the id as the array index
+                        _travelTypes[row.Field<int>("ID")] = row.Field<string>("TravelType");
+					}
+                }
             } else
             {
                 if (Request.Form["__EVENTTARGET"] != null)
