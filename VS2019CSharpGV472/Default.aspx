@@ -7,21 +7,29 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4">
-            <asp:Button ID="btnAddGrid" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
-            <asp:Button ID="btnAddRow" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
-        </div>
+        <asp:updatepanel id="Updatepanel2" UpdateMode="Conditional" class="col-md-4" runat="server">
+            <ContentTemplate>
+                <asp:Button ID="btnAddGrid" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
+                <asp:Button ID="btnAddRow" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
+            </ContentTemplate>
+        </asp:updatepanel>
+    </div>
+    
+    <div class="row">
+        <asp:updatepanel id="upGridViews" UpdateMode="Conditional" class="col-md-4" runat="server">
+            <ContentTemplate>
+                <asp:GridView ID="gv1" runat="server"></asp:GridView>
+            </ContentTemplate>
+        </asp:updatepanel>
     </div>
 
     <div class="row">
-        <div id="divGridView" class="col-md-4" runat="server">
-            <asp:GridView ID="gv1" runat="server"></asp:GridView>
-        </div>
-    </div>
-
-    <div class="row">
         <div class="col-md-4">
-            <asp:Label ID="lbCurrentGrid" runat="server" Text="Current: First Grid"></asp:Label>
+            <asp:UpdatePanel ID="UpdatePanel1" UpdateMode="Conditional" runat="server">
+                <ContentTemplate>
+                    <asp:Label ID="lbCurrentGrid" runat="server" Text="Current: First Grid"></asp:Label>
+                </ContentTemplate>
+            </asp:UpdatePanel>
         </div>
     </div>
 

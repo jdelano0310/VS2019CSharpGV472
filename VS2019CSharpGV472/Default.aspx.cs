@@ -63,7 +63,8 @@ namespace VS2019CSharpGV472
             gv.DataSource = mytable;
             gv.DataBind();
 
-            divGridView.Controls.Add(gv);
+            upGridViews.ContentTemplateContainer.Controls.Add(gv);
+            upGridViews.Update();
         }
         protected void btnAddGrid_Click(object sender, EventArgs e)
         {
@@ -91,7 +92,8 @@ namespace VS2019CSharpGV472
             gv.DataSource = mytable;
             gv.DataBind();
 
-            divGridView.Controls.Add(gv);
+            upGridViews.ContentTemplateContainer.Controls.Add(gv);
+            upGridViews.Update();
             Session["gv2"] = gv;
 
             lbCurrentGrid.Text = "Current: Second Grid";
@@ -125,8 +127,11 @@ namespace VS2019CSharpGV472
 
             // if this isn't adding a row to the inital grid then add the grid back to the
             // page
-            if (lbCurrentGrid.Text.IndexOf("First") == -1) 
-                divGridView.Controls.Add(gvTemp);
+            if (lbCurrentGrid.Text.IndexOf("First") == -1) { 
+                upGridViews.ContentTemplateContainer.Controls.Add(gvTemp);
+            }
+
+            upGridViews.Update();
         }
     }
 }
