@@ -10,29 +10,14 @@ namespace VS2019CSharpGV472
 {
     public partial class _Default : Page
     {
-        
+        // hold the types so that a trip to the db isn't required on each new row
+        private string[] _travelTypes; 
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
             if (!IsPostBack) {
                 // put some data in the existing grid view
-                DataTable mytable = new DataTable();
-                mytable.Columns.Add("FirstName", typeof(string));
-                mytable.Columns.Add("LastName", typeof(string));
-
-                DataRow dr = mytable.NewRow();
-                dr["FirstName"] = "Person";
-                dr["LastName"] = "Number1";
-                mytable.Rows.Add(dr);
-
-                dr = mytable.NewRow();
-                dr["FirstName"] = "Person";
-                dr["LastName"] = "Number2";
-                mytable.Rows.Add(dr);
-
-                Session["grid1Table"] = mytable;
-                gv1.DataSource = mytable;
-                gv1.DataBind();
 
             } else
             {
@@ -40,10 +25,10 @@ namespace VS2019CSharpGV472
 				{
                     if (Request.Form["__EVENTTARGET"].IndexOf("btnAddRow") == -1)
 					{
-                        // check for the other grid
-                        if (Session["grid2Table"] != null)
+                        // if the user isn't adding a row simply redisplay any added grids
+                        if (Convert.ToInt32(Session["gridCount"]) >  0)
                         {
-                            ReDisplayGridView("grid2Table");
+                            ReDisplayGridViews();
                         }
                     }
                 }
@@ -51,7 +36,7 @@ namespace VS2019CSharpGV472
             }
         }
 
-        protected void ReDisplayGridView(string gvName)
+        protected void ReDisplayGridViews()
         {
             GridView gv;
             gv = new GridView();

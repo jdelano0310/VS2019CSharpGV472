@@ -9,8 +9,8 @@
     <div class="row">
         <asp:updatepanel id="Updatepanel2" UpdateMode="Conditional" class="col-md-4" runat="server">
             <ContentTemplate>
-                <asp:Button ID="btnAddGrid" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
                 <asp:Button ID="btnAddRow" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
+                <asp:Button ID="btnAddGrid" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
             </ContentTemplate>
         </asp:updatepanel>
     </div>
@@ -18,7 +18,31 @@
     <div class="row">
         <asp:updatepanel id="upGridViews" UpdateMode="Conditional" class="col-md-4" runat="server">
             <ContentTemplate>
-                <asp:GridView ID="gv1" runat="server"></asp:GridView>
+                <asp:GridView ID="gv1" runat="server" AutoGenerateColumns="False">
+                    
+                    <Columns>
+                        <asp:TemplateField HeaderText="Travel Type">
+                            <ItemTemplate>
+                                <asp:DropDownList ID="ddlTravelType" runat="server">
+                                    <asp:ListItem>Cruise</asp:ListItem>
+                                    <asp:ListItem>Flight</asp:ListItem>
+                                    <asp:ListItem>Train</asp:ListItem>
+                                </asp:DropDownList>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Cost">
+                            <Itemtemplate>
+                                <asp:TextBox ID="txtCost" runat="server"></asp:TextBox>
+                            </Itemtemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Total" ItemStyle-Width="100px">
+                            <Itemtemplate>
+                                <asp:Label ID="lblTotalCost" runat="server"></asp:Label>
+                            </Itemtemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                    
+                </asp:GridView>
             </ContentTemplate>
         </asp:updatepanel>
     </div>
