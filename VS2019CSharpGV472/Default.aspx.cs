@@ -36,11 +36,18 @@ namespace VS2019CSharpGV472
 
             } else
             {
-                // check for the other grid 
-                if (Session["grid2Table"] != null)
-                {
-                    ReDisplayGridView("grid2Table");
+                if (Request.Form["__EVENTTARGET"] != null)
+				{
+                    if (Request.Form["__EVENTTARGET"].IndexOf("btnAddRow") == -1)
+					{
+                        // check for the other grid
+                        if (Session["grid2Table"] != null)
+                        {
+                            ReDisplayGridView("grid2Table");
+                        }
+                    }
                 }
+                 
             }
         }
 
@@ -50,6 +57,7 @@ namespace VS2019CSharpGV472
             gv = new GridView();
 
             // reassign the datatable it used
+            // putting the object in front casts the session value as that object
             DataTable mytable = (DataTable)Session["grid2Table"];
                        
             gv.DataSource = mytable;
@@ -103,7 +111,7 @@ namespace VS2019CSharpGV472
             } else
             {
                 // the added grid on the page
-                gvTemp = (GridView)Session["gv2"];  
+                gvTemp = new GridView();  
                 mytable = (DataTable)Session["grid2Table"];
             }
 
@@ -115,6 +123,10 @@ namespace VS2019CSharpGV472
             gvTemp.DataSource = mytable;
             gvTemp.DataBind();
 
+            // if this isn't adding a row to the inital grid then add the grid back to the
+            // page
+            if (lbCurrentGrid.Text.IndexOf("First") == -1) 
+                divGridView.Controls.Add(gvTemp);
         }
     }
 }
