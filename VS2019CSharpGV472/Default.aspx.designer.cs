@@ -15,33 +15,6 @@ namespace VS2019CSharpGV472
 	{
 
 		/// <summary>
-		/// Updatepanel2 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.UpdatePanel Updatepanel2;
-
-		/// <summary>
-		/// btnAddRow control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.Button btnAddRow;
-
-		/// <summary>
-		/// btnAddGrid control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.Button btnAddGrid;
-
-		/// <summary>
 		/// upGridViews control.
 		/// </summary>
 		/// <remarks>
@@ -49,6 +22,33 @@ namespace VS2019CSharpGV472
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
 		protected global::System.Web.UI.UpdatePanel upGridViews;
+
+		/// <summary>
+		/// btnAddRow1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.Button btnAddRow1;
+
+		/// <summary>
+		/// btnAddGrid1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.Button btnAddGrid1;
+
+		/// <summary>
+		/// ddlProducts1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.DropDownList ddlProducts1;
 
 		/// <summary>
 		/// gv1 control.
@@ -69,12 +69,12 @@ namespace VS2019CSharpGV472
 		protected global::System.Web.UI.UpdatePanel UpdatePanel1;
 
 		/// <summary>
-		/// lbCurrentGrid control.
+		/// lbGridCount control.
 		/// </summary>
 		/// <remarks>
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::System.Web.UI.WebControls.Label lbCurrentGrid;
+		protected global::System.Web.UI.WebControls.Label lbGridCount;
 	}
 }

@@ -12,34 +12,22 @@ namespace VS2019CSharpGV472
     public partial class _Default : Page
     {
         // hold the types so that a trip to the db isn't required on each new row
-        private string[] _travelTypes; 
+        private string[] _products;
+        private string[,] _categories;
 
         protected void Page_Load(object sender, EventArgs e)
         {
 
             if (!IsPostBack) {
-                // put some data in the existing grid view
-                using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TravelDB;Integrated Security=True;"))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("Select * from tblTravelTypes Order by TravelType", conn);
-                    SqlDataReader dr = cmd.ExecuteReader();
 
-                    // to get the number of rows the reader has load it into a table
-                    DataTable dt = new DataTable();
-                    dt.Load(dr);
-                    int numRows = dt.Rows.Count;
-                    
-                    // scope the array variable that holds the Travel Types for the dropdown
-                    _travelTypes = new string[numRows];
+                GetProducts();
+                GetCategories();
 
-                    // fill the array with the types
-                    foreach (DataRow row in dt.Rows)
-					{
-                        // use the id as the array index
-                        _travelTypes[row.Field<int>("ID")] = row.Field<string>("TravelType");
-					}
-                }
+                Session["GridViewsCount"] = 1;
+                
+                FillProductDropDown(this.ddlProducts1);
+                SetupDatatableForGrid("1");
+
             } else
             {
                 if (Request.Form["__EVENTTARGET"] != null)
@@ -55,6 +43,114 @@ namespace VS2019CSharpGV472
                 }
                  
             }
+        }
+
+        protected void FillProductDropDown(DropDownList ddlToFill)
+		{
+            // use the saved array to fill the dropdownlist passed
+            int itemCount = 0;
+
+            ddlToFill.Items.Insert(itemCount, "Please select a Product");
+            foreach (string item in _products)
+            {
+                itemCount += 1;
+                if (item != null) { ddlToFill.Items.Insert(itemCount -1, item); }
+            }
+        }
+
+        protected void GetCategories()
+		{
+            // grab the dropdown contents for the categories dropdown on first page load
+            // limits the back and fourth to the database
+            using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GridTest;Integrated Security=True;"))
+            {
+                conn.Open();
+
+                // find the maximum number of categories a product has in the categories table
+                SqlCommand cmd = new SqlCommand("select max(NumberOfCategories) from (select count(id) as NumberOfCategories from tblCategories group by ProductID) as tbl1;", conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+                dr.Read();
+                int maxNumberOfCategories = dr.GetInt32(0);
+                dr.Close();
+
+                // get the catergoies from the table
+                cmd = new SqlCommand("Select * from tblCategories Order by ProductID", conn);
+                dr = cmd.ExecuteReader();
+
+                int numProducts = _products.Length;
+
+                // scope the array variable that holds the Travel Types for the dropdown
+                _categories = new string[numProducts, maxNumberOfCategories + 1];
+
+                int categoryByProductIndex = 1;
+                int currentProductID = 0;
+
+                // fill the array with the categories
+                while (dr.Read())
+				{
+                    if (currentProductID != dr.GetInt32(1))
+					    { categoryByProductIndex = 1;
+                        currentProductID = dr.GetInt32(1);} 
+                    else { categoryByProductIndex += 1; }
+
+                    _categories[dr.GetInt32(1), categoryByProductIndex] = dr.GetString(2);
+                }
+
+            }
+        }
+
+        protected void GetProducts()
+        {
+            // only grab the dropdown contents for the products dropdown on first page load
+            using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GridTest;Integrated Security=True;"))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("Select * from tblProducts Order by ID", conn);
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                // to get the number of rows the reader has, load it into a table
+                DataTable dt = new DataTable();
+                dt.Load(dr);
+                int numRows = dt.Rows.Count;
+
+                // scope the array variable that holds the Products for the dropdown
+                _products = new string[numRows + 1];
+
+                // fill the array with the products
+                foreach (DataRow row in dt.Rows)
+                {
+                    // use the id as the array index
+                    _products[row.Field<int>("ID")] = row.Field<string>("Product");
+                }
+            }
+        }
+
+
+        protected void SetupDatatableForGrid(string GridNumber)
+		{
+            // each GridView needs a DataTable where the new row is actually added
+            // these are in session memory and can be saved to a table at any time
+            DataTable mytable = new DataTable();
+            mytable.Columns.Add("ID", typeof(Int16));
+            mytable.Columns.Add("CategoryID", typeof(Int16));
+            mytable.Columns.Add("Amount", typeof(float));
+            mytable.Columns.Add("TaxAmount", typeof(float));
+            mytable.Columns.Add("DateCreated", typeof(DateTime));
+
+            DataRow dr = mytable.NewRow();
+            dr["CategoryID"] = 0;
+            dr["Amount"] = 0;
+            dr["TaxAmount"] = 0;
+            dr["DateCreated"] = DateTime.Now;
+            mytable.Rows.Add(dr);
+
+            string gridDataName = $"Grid{GridNumber}Datatable";
+
+            Session[gridDataName] = mytable;
+            
+            GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
+            gv.DataSource = mytable;
+            gv.DataBind();
         }
 
         protected void ReDisplayGridViews()
@@ -102,7 +198,7 @@ namespace VS2019CSharpGV472
             upGridViews.Update();
             Session["gv2"] = gv;
 
-            lbCurrentGrid.Text = "Current: Second Grid";
+            //lbCurrentGrid.Text = "Current: Second Grid";
         }
 
         protected void btnAddRow_Click(object sender, EventArgs e)
@@ -110,8 +206,8 @@ namespace VS2019CSharpGV472
             GridView gvTemp;
             DataTable mytable;
 
-            // putting the object in front casts the session value as that object
-            if (lbCurrentGrid.Text.IndexOf("First") > 0)
+            // putting the type in front casts the session value as that type
+            if ((int)Session["GridViewsCount"] == 1)
             {
                 // the original grid on the page
                 mytable = (DataTable)Session["grid1Table"];
@@ -123,21 +219,22 @@ namespace VS2019CSharpGV472
                 mytable = (DataTable)Session["grid2Table"];
             }
 
-            DataRow dr = mytable.NewRow();
-            dr["FirstName"] = "Person";
-            dr["LastName"] = "Number6";
-            mytable.Rows.Add(dr);
-
-            gvTemp.DataSource = mytable;
-            gvTemp.DataBind();
+            
+            //GridViewRow gvr = new GridViewRow();
 
             // if this isn't adding a row to the inital grid then add the grid back to the
             // page
-            if (lbCurrentGrid.Text.IndexOf("First") == -1) { 
-                upGridViews.ContentTemplateContainer.Controls.Add(gvTemp);
-            }
+            //if (lbCurrentGrid.Text.IndexOf("First") == -1) { 
+            //    upGridViews.ContentTemplateContainer.Controls.Add(gvTemp);
+            //}
 
             upGridViews.Update();
         }
-    }
+
+		protected void ddlProducts_SelectedIndexChanged(object sender, EventArgs e)
+		{
+            // general event to fill the associated Grids category dropdown
+
+		}
+	}
 }
