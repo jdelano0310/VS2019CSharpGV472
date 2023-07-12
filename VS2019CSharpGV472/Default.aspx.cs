@@ -26,7 +26,7 @@ namespace VS2019CSharpGV472
                 Session["GridViewsCount"] = 1;
                 
                 FillProductDropDown(this.ddlProducts1);
-                SetupDatatableForGrid("1");
+                AddRowToDatatableForGrid("1");
 
                 // save the arrays in a session var
                 Session["Products"] = _products;
@@ -156,16 +156,27 @@ namespace VS2019CSharpGV472
         }
 
 
-        protected void SetupDatatableForGrid(string GridNumber)
+        protected void AddRowToDatatableForGrid(string GridNumber)
 		{
             // each GridView needs a DataTable where the new row is actually added
             // these are in session memory and can be saved to a table at any time
-            DataTable mytable = new DataTable();
-            mytable.Columns.Add("ID", typeof(Int16));
-            mytable.Columns.Add("CategoryID", typeof(Int16));
-            mytable.Columns.Add("Amount", typeof(float));
-            mytable.Columns.Add("TaxAmount", typeof(float));
-            mytable.Columns.Add("DateCreated", typeof(DateTime));
+            DataTable mytable;
+            string gridDataName = $"Grid{GridNumber}Datatable";
+
+            if (Session[gridDataName] == null)
+            {
+                // there isn't an associated datatable with the grid, create a new one
+                mytable = new DataTable();
+                mytable.Columns.Add("ID", typeof(Int16));
+                mytable.Columns.Add("CategoryID", typeof(Int16));
+                mytable.Columns.Add("Amount", typeof(float));
+                mytable.Columns.Add("TaxAmount", typeof(float));
+                mytable.Columns.Add("DateCreated", typeof(DateTime));
+            } else
+			{
+                // else use the one that exists already
+                mytable = Session[$"Grid{GridNumber}Datatable"] as DataTable;
+            }
 
             DataRow dr = mytable.NewRow();
             dr["CategoryID"] = 0;
@@ -174,13 +185,27 @@ namespace VS2019CSharpGV472
             dr["DateCreated"] = DateTime.Now;
             mytable.Rows.Add(dr);
 
-            string gridDataName = $"Grid{GridNumber}Datatable";
-
             Session[gridDataName] = mytable;
             
             GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
             gv.DataSource = mytable;
             gv.DataBind();
+
+            if (mytable.Rows.Count > 1) { 
+                // adding a row to a grid that contains a row, need to now fill the new dropdown list
+                DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
+
+                // for which product id should the category dropdown be filled with
+                int forProductID = productDDL.SelectedIndex;
+
+                FillCategoryDropDown(categoryDDL, forProductID);
+
+            }
+
+            // udpate the panel (update panels stop the page from flashing)
+            upGridViews.Update();
+
         }
 
         protected void ReDisplayGridViews()
@@ -233,32 +258,14 @@ namespace VS2019CSharpGV472
 
         protected void btnAddRow_Click(object sender, EventArgs e)
         {
-            GridView gvTemp;
-            DataTable mytable;
 
-            // putting the type in front casts the session value as that type
-            if ((int)Session["GridViewsCount"] == 1)
-            {
-                // the original grid on the page
-                mytable = (DataTable)Session["grid1Table"];
-                gvTemp = gv1;
-            } else
-            {
-                // the added grid on the page
-                gvTemp = new GridView();  
-                mytable = (DataTable)Session["grid2Table"];
-            }
+            // which button is calling
+            Button callingBTN = sender as Button;
+            string callingBTNNumber = callingBTN.ID.Substring(callingBTN.ID.Length - 1, 1);
 
-            
-            //GridViewRow gvr = new GridViewRow();
+            // add a new row to the associated gridview and table
+            AddRowToDatatableForGrid(callingBTNNumber);
 
-            // if this isn't adding a row to the inital grid then add the grid back to the
-            // page
-            //if (lbCurrentGrid.Text.IndexOf("First") == -1) { 
-            //    upGridViews.ContentTemplateContainer.Controls.Add(gvTemp);
-            //}
-
-            upGridViews.Update();
         }
 
 		protected void ddlProducts_SelectedIndexChanged(object sender, EventArgs e)
@@ -281,7 +288,7 @@ namespace VS2019CSharpGV472
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;
-
+                        
             FillCategoryDropDown(categoryDDL, forProductID);
         }
 	}
