@@ -23,16 +23,9 @@
                                 </asp:DropDownList>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderText="Amount">
-                            <Itemtemplate>
-                                <asp:TextBox ID="txtAmount1" runat="server"></asp:TextBox>
-                            </Itemtemplate>
-                        </asp:TemplateField>
-                        <asp:TemplateField HeaderText="TaxAmount" ItemStyle-Width="100px">
-                            <Itemtemplate>
-                                <asp:Label ID="lblTaxAmount1" runat="server"></asp:Label>
-                            </Itemtemplate>
-                        </asp:TemplateField>
+                        <asp:BoundField DataField="CategoryID" HeaderText="CategoryID" ReadOnly="True" Visible="False" />
+                        <asp:BoundField DataField="Amount" HeaderText="Amount" />
+                        <asp:BoundField DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" />
                     </Columns>
                     
                 </asp:GridView>

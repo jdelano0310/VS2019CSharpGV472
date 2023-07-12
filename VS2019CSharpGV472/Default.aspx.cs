@@ -35,6 +35,7 @@ namespace VS2019CSharpGV472
             }
             else
             {
+
                 if (Request.Form["__EVENTTARGET"] != null)
 				{
                     if (Request.Form["__EVENTTARGET"].IndexOf("btnAddRow") == -1)
@@ -50,6 +51,25 @@ namespace VS2019CSharpGV472
             }
         }
 
+        class DropDownListColumn : ITemplate
+        {
+            public void InstantiateIn(System.Web.UI.Control container)
+            {
+                DropDownList ddl = new DropDownList();
+                ddl.ID = "ddlCategory";
+                container.Controls.Add(ddl);
+            }
+        }
+
+        class TextBoxColumn : ITemplate
+        {
+            public void InstantiateIn(System.Web.UI.Control container)
+            {
+                TextBox tb = new TextBox();
+                tb.ID = "txtAmount";
+                container.Controls.Add(tb);
+            }
+        }
         protected void FillProductDropDown(DropDownList ddlToFill)
 		{
             // use the saved array to fill the dropdownlist passed
@@ -163,8 +183,16 @@ namespace VS2019CSharpGV472
             DataTable mytable;
             DataRow dr;
             //GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
-            GridView gv = (GridView)divGridSection.FindControl($"gv{GridNumber}");
+            GridView gv;
 
+            if (Session[$"GridView{GridNumber}"] != null)
+			{
+                gv = Session[$"GridView{GridNumber}"] as GridView;
+            } else
+			{
+                gv = (GridView)divGridSection.FindControl($"gv{GridNumber}");
+            }
+            
             string gridDataName = $"Grid{GridNumber}Datatable";
 
             if (Session[gridDataName] == null)
@@ -225,6 +253,8 @@ namespace VS2019CSharpGV472
 				FillCategoryDropDown(categoryDDL, forProductID);
 
 			}
+
+            Session[$"GridView{GridNumber}"] = gv;
 
 			// udpate the panel (update panels stop the page from flashing)
 			//upGridViews.Update();
