@@ -267,11 +267,17 @@ namespace VS2019CSharpGV472
             DropDownList callingDDL = sender as DropDownList;
             
             // which product dropdown list is calling
-            string callingDDLNumber = callingDDL.ID.Substring(1, callingDDL.ID.Length - 1);
+            string callingDDLNumber = callingDDL.ID.Substring(callingDDL.ID.Length - 1, 1);
 
             // calculate the category dropdown list to fill and find it on the page
             string fillCategoryDDLName = $"ddlCategory{callingDDLNumber}";
-            DropDownList categoryDDL = (DropDownList)upGridViews.FindControl(fillCategoryDDLName);
+            
+            // find the number of rows that are in the table the gridview is connected to
+            DataTable dt = Session[$"Grid{callingDDLNumber}Datatable"] as DataTable;
+
+            GridView gv = (GridView)upGridViews.FindControl($"gv{callingDDLNumber}");
+
+            DropDownList categoryDDL = gv.Rows[dt.Rows.Count-1].FindControl(fillCategoryDDLName) as DropDownList;
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;

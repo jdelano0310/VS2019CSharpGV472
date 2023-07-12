@@ -19,7 +19,7 @@
                 <asp:GridView ID="gv1" runat="server" AutoGenerateColumns="False">
                     
                     <Columns>
-                        <asp:TemplateField HeaderText="Travel Type">
+                        <asp:TemplateField HeaderText="Category">
                             <ItemTemplate>
                                 <asp:DropDownList ID="ddlCategory1" runat="server">
                                 </asp:DropDownList>
