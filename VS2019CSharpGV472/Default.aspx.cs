@@ -51,25 +51,6 @@ namespace VS2019CSharpGV472
             }
         }
 
-        class DropDownListColumn : ITemplate
-        {
-            public void InstantiateIn(System.Web.UI.Control container)
-            {
-                DropDownList ddl = new DropDownList();
-                ddl.ID = "ddlCategory";
-                container.Controls.Add(ddl);
-            }
-        }
-
-        class TextBoxColumn : ITemplate
-        {
-            public void InstantiateIn(System.Web.UI.Control container)
-            {
-                TextBox tb = new TextBox();
-                tb.ID = "txtAmount";
-                container.Controls.Add(tb);
-            }
-        }
         protected void FillProductDropDown(DropDownList ddlToFill)
 		{
             // use the saved array to fill the dropdownlist passed
@@ -214,13 +195,13 @@ namespace VS2019CSharpGV472
 
                 // write last row from the grid to the previous row in the assiciated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                //TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
+                TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
                 //Label lblTaxAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"lblTaxAmount{GridNumber}") as Label;
                                 
                 dr["ID"] = mytable.Rows.Count;
                 dr["CategoryID"] = categoryDDL.SelectedIndex;
-                dr["Amount"] = "50";
-                dr["TaxAmount"] = 50 * 1.13;
+                dr["Amount"] = txtAmount.Text;
+                dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
                 //dr["DateCreated"] = DateTime.Now;
 
             }
@@ -258,9 +239,19 @@ namespace VS2019CSharpGV472
 					{
                         // reselect the item that was selected before postback
                         categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
-                    }
+
+                        // this has already been entered
+                        TextBox txtAmount = gr.FindControl($"txtAmount{GridNumber}") as TextBox;
+                        txtAmount.Enabled = false;
+
+                    } 
                 }
-			}
+			} else
+			{
+                // disable the drop down until the product is selected
+                DropDownList categoryDDL = gv.Rows[0].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                categoryDDL.Enabled = false;
+            }
 
             //Session[$"GridView{GridNumber}"] = gv;
 
@@ -287,34 +278,7 @@ namespace VS2019CSharpGV472
         protected void btnAddGrid_Click(object sender, EventArgs e)
         {
             // create a new gridview programmatically
-            GridView gv;
-            gv = new GridView();
-            gv.ID = "gv2";
-
-            // it needs a datatable
-            DataTable mytable = new DataTable();
-            mytable.Columns.Add("FirstName", typeof(string));
-            mytable.Columns.Add("LastName", typeof(string));
-
-            DataRow dr = mytable.NewRow();
-            dr["FirstName"] = "Person";
-            dr["LastName"] = "Number3";
-            mytable.Rows.Add(dr);
-
-            dr = mytable.NewRow();
-            dr["FirstName"] = "Person";
-            dr["LastName"] = "Number4";
-            mytable.Rows.Add(dr);
-
-            Session["grid2Table"] = mytable;
-            gv.DataSource = mytable;
-            gv.DataBind();
-
-            //upGridViews.ContentTemplateContainer.Controls.Add(gv);
-            //upGridViews.Update();
-            Session["gv2"] = gv;
-
-            //lbCurrentGrid.Text = "Current: Second Grid";
+            
         }
 
         protected void btnAddRow_Click(object sender, EventArgs e)
