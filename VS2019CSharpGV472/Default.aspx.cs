@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -278,7 +279,10 @@ namespace VS2019CSharpGV472
         protected void btnAddGrid_Click(object sender, EventArgs e)
         {
             // create a new gridview programmatically
-            
+            Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
+
+            HtmlInputGenericControl newDiv = new HtmlInputGenericControl("DIV");
+            newDiv.ID = $"divCopyMe" + Session["GridViewsCount"];
         }
 
         protected void btnAddRow_Click(object sender, EventArgs e)
