@@ -214,13 +214,13 @@ namespace VS2019CSharpGV472
 
                 // write last row from the grid to the previous row in the assiciated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
+                //TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
                 //Label lblTaxAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"lblTaxAmount{GridNumber}") as Label;
                                 
                 dr["ID"] = mytable.Rows.Count;
                 dr["CategoryID"] = categoryDDL.SelectedIndex;
-                dr["Amount"] = txtAmount.Text;
-                dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
+                dr["Amount"] = "50";
+                dr["TaxAmount"] = 50 * 1.13;
                 //dr["DateCreated"] = DateTime.Now;
 
             }
@@ -242,19 +242,27 @@ namespace VS2019CSharpGV472
 
 			if (mytable.Rows.Count > 1)
 			{
-				// adding a row to a grid that contains a row, need to now fill the new dropdown list
-				DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
-                //DropDownList productDDL = divGridSection.FindControl($"ddlProducts{GridNumber}") as DropDownList;
+                // adding a row to a grid that contains a row, need to now fill the new dropdown list
 
                 // for which product id should the category dropdown be filled with
+                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
                 int forProductID = productDDL.SelectedIndex;
 
-				FillCategoryDropDown(categoryDDL, forProductID);
+                // re-populate the dropdown lists
+                foreach (GridViewRow gr in gv.Rows)
+				{
+                    DropDownList categoryDDL = gr.FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                    FillCategoryDropDown(categoryDDL, forProductID);
 
+                    if (gr.Cells[1].Text != "0")
+					{
+                        // reselect the item that was selected before postback
+                        categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
+                    }
+                }
 			}
 
-            Session[$"GridView{GridNumber}"] = gv;
+            //Session[$"GridView{GridNumber}"] = gv;
 
 			// udpate the panel (update panels stop the page from flashing)
 			//upGridViews.Update();
