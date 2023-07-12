@@ -28,7 +28,12 @@ namespace VS2019CSharpGV472
                 FillProductDropDown(this.ddlProducts1);
                 SetupDatatableForGrid("1");
 
-            } else
+                // save the arrays in a session var
+                Session["Products"] = _products;
+                Session["Categories"] = _categories;
+
+            }
+            else
             {
                 if (Request.Form["__EVENTTARGET"] != null)
 				{
@@ -51,6 +56,11 @@ namespace VS2019CSharpGV472
             int itemCount = 0;
 
             ddlToFill.Items.Insert(itemCount, "Please select a Product");
+            
+            if (Session["Products"] != null) {
+                _products = (string[])Session["Products"];
+            }
+
             foreach (string item in _products)
             {
                 itemCount += 1;
@@ -58,9 +68,29 @@ namespace VS2019CSharpGV472
             }
         }
 
+        protected void FillCategoryDropDown(DropDownList ddlToFill, int ProductID)
+        {
+            // use the saved array to fill the dropdownlist passed
+            ddlToFill.Items.Insert(0, "Select a Cateorgy");
+
+            if (Session["Categories"] != null)
+            {
+                _categories = (string[,])Session["Categories"];
+            }
+
+            // for the certain productid
+            for (int p = 1; p <= ProductID; p++)
+            {
+                for (int c = 1; c <= _categories.GetUpperBound(1); c++)
+				{
+                    ddlToFill.Items.Insert(c, _categories[p, c]);
+                }
+            }
+
+        }
         protected void GetCategories()
 		{
-            // grab the dropdown contents for the categories dropdown on first page load
+            // grab the dropdown contents for the categories dropdown
             // limits the back and fourth to the database
             using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GridTest;Integrated Security=True;"))
             {
@@ -101,7 +131,7 @@ namespace VS2019CSharpGV472
 
         protected void GetProducts()
         {
-            // only grab the dropdown contents for the products dropdown on first page load
+            // grab the dropdown contents for the products dropdown
             using (SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GridTest;Integrated Security=True;"))
             {
                 conn.Open();
@@ -234,7 +264,19 @@ namespace VS2019CSharpGV472
 		protected void ddlProducts_SelectedIndexChanged(object sender, EventArgs e)
 		{
             // general event to fill the associated Grids category dropdown
+            DropDownList callingDDL = sender as DropDownList;
+            
+            // which product dropdown list is calling
+            string callingDDLNumber = callingDDL.ID.Substring(1, callingDDL.ID.Length - 1);
 
-		}
+            // calculate the category dropdown list to fill and find it on the page
+            string fillCategoryDDLName = $"ddlCategory{callingDDLNumber}";
+            DropDownList categoryDDL = (DropDownList)upGridViews.FindControl(fillCategoryDDLName);
+
+            // for which product id should the category dropdown be filled with
+            int forProductID = callingDDL.SelectedIndex;
+
+            FillCategoryDropDown(categoryDDL, forProductID);
+        }
 	}
 }

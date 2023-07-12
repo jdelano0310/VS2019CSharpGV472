@@ -13,7 +13,7 @@
                 <div class="row">
                     <asp:Button ID="btnAddRow1" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
                     <asp:Button ID="btnAddGrid1" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
-                    <asp:DropDownList ID="ddlProducts1" runat="server" OnSelectedIndexChanged="ddlProducts_SelectedIndexChanged">
+                    <asp:DropDownList ID="ddlProducts1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProducts_SelectedIndexChanged" >
                     </asp:DropDownList>
                 </div>
                 <asp:GridView ID="gv1" runat="server" AutoGenerateColumns="False">
@@ -21,7 +21,7 @@
                     <Columns>
                         <asp:TemplateField HeaderText="Travel Type">
                             <ItemTemplate>
-                                <asp:DropDownList ID="ddlCategory" runat="server">
+                                <asp:DropDownList ID="ddlCategory1" runat="server">
                                 </asp:DropDownList>
                             </ItemTemplate>
                         </asp:TemplateField>
