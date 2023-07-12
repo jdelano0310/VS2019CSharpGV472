@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="VS2019CSharpGV472._Default" %>
+﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="VS2019CSharpGV472._Default" EnableViewState="true" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -16,7 +16,7 @@
                     <asp:DropDownList ID="ddlProducts1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProducts_SelectedIndexChanged" >
                     </asp:DropDownList>
                 </div>
-                <asp:GridView ID="gv1" runat="server" AutoGenerateColumns="False">
+                <asp:GridView ID="gv1" runat="server" AutoGenerateColumns="False" EmptyDataText="No Data Exists Yet">
                     
                     <Columns>
                         <asp:TemplateField HeaderText="Category">
@@ -27,12 +27,12 @@
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="Amount">
                             <Itemtemplate>
-                                <asp:TextBox ID="txtAmount" runat="server"></asp:TextBox>
+                                <asp:TextBox ID="txtAmount1" runat="server"></asp:TextBox>
                             </Itemtemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="TaxAmount" ItemStyle-Width="100px">
                             <Itemtemplate>
-                                <asp:Label ID="lblTaxAmount" runat="server"></asp:Label>
+                                <asp:Label ID="lblTaxAmount1" runat="server"></asp:Label>
                             </Itemtemplate>
                         </asp:TemplateField>
                     </Columns>

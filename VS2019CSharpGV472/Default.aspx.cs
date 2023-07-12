@@ -161,12 +161,16 @@ namespace VS2019CSharpGV472
             // each GridView needs a DataTable where the new row is actually added
             // these are in session memory and can be saved to a table at any time
             DataTable mytable;
+            DataRow dr;
+            GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
+
             string gridDataName = $"Grid{GridNumber}Datatable";
 
             if (Session[gridDataName] == null)
             {
                 // there isn't an associated datatable with the grid, create a new one
                 mytable = new DataTable();
+                mytable.TableName = gridDataName;
                 mytable.Columns.Add("ID", typeof(Int16));
                 mytable.Columns.Add("CategoryID", typeof(Int16));
                 mytable.Columns.Add("Amount", typeof(float));
@@ -176,35 +180,52 @@ namespace VS2019CSharpGV472
 			{
                 // else use the one that exists already
                 mytable = Session[$"Grid{GridNumber}Datatable"] as DataTable;
+
+                dr = mytable.Rows[mytable.Rows.Count - 1];
+
+                // write last row from the grid to the previous row in the assiciated table
+                DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
+                //Label lblTaxAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"lblTaxAmount{GridNumber}") as Label;
+                                
+                dr["ID"] = mytable.Rows.Count;
+                dr["CategoryID"] = categoryDDL.SelectedIndex;
+                dr["Amount"] = txtAmount.Text;
+                dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
+                //dr["DateCreated"] = DateTime.Now;
+
             }
 
-            DataRow dr = mytable.NewRow();
+            dr = mytable.NewRow();
             dr["CategoryID"] = 0;
             dr["Amount"] = 0;
             dr["TaxAmount"] = 0;
-            dr["DateCreated"] = DateTime.Now;
+            //dr["DateCreated"] = DateTime.Now;
             mytable.Rows.Add(dr);
 
             Session[gridDataName] = mytable;
-            
-            GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
-            gv.DataSource = mytable;
-            gv.DataBind();
 
-            if (mytable.Rows.Count > 1) { 
-                // adding a row to a grid that contains a row, need to now fill the new dropdown list
-                DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
-
-                // for which product id should the category dropdown be filled with
-                int forProductID = productDDL.SelectedIndex;
-
-                FillCategoryDropDown(categoryDDL, forProductID);
-
+            if (gv.DataSource == null)
+            {
+                gv.DataSource = mytable;
+                gv.DataBind();
             }
 
-            // udpate the panel (update panels stop the page from flashing)
-            upGridViews.Update();
+			if (mytable.Rows.Count > 1)
+			{
+				// adding a row to a grid that contains a row, need to now fill the new dropdown list
+				DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+				DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
+
+				// for which product id should the category dropdown be filled with
+				int forProductID = productDDL.SelectedIndex;
+
+				FillCategoryDropDown(categoryDDL, forProductID);
+
+			}
+
+			// udpate the panel (update panels stop the page from flashing)
+			upGridViews.Update();
 
         }
 
