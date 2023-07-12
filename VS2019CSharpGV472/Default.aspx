@@ -7,8 +7,9 @@
     </div>
     
     <div class="row">
-
-                <div class="col-md-4" id="divGridSection" runat="server">
+        <asp:updatepanel id="upGridViews" UpdateMode="Conditional" class="col-md-4" runat="server">
+            <ContentTemplate>
+                <div class="row">
                     <asp:Button ID="btnAddRow1" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
                     <asp:Button ID="btnAddGrid1" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
                     <asp:DropDownList ID="ddlProducts1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProducts_SelectedIndexChanged" >
@@ -23,12 +24,14 @@
                                 </asp:DropDownList>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:BoundField DataField="CategoryID" HeaderText="CategoryID" ReadOnly="True" Visible="False" />
+                        <asp:BoundField DataField="CategoryID" HeaderText="CategoryID" ReadOnly="True" />
                         <asp:BoundField DataField="Amount" HeaderText="Amount" />
                         <asp:BoundField DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" />
                     </Columns>
                     
                 </asp:GridView>
+            </ContentTemplate>
+        </asp:updatepanel>
     </div>
 
     <div class="row">

@@ -182,16 +182,16 @@ namespace VS2019CSharpGV472
             // these are in session memory and can be saved to a table at any time
             DataTable mytable;
             DataRow dr;
-            //GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
-            GridView gv;
+            GridView gv = (GridView)upGridViews.FindControl($"gv{GridNumber}");
+   //         GridView gv;
 
-            if (Session[$"GridView{GridNumber}"] != null)
-			{
-                gv = Session[$"GridView{GridNumber}"] as GridView;
-            } else
-			{
-                gv = (GridView)divGridSection.FindControl($"gv{GridNumber}");
-            }
+   //         if (Session[$"GridView{GridNumber}"] != null)
+			//{
+   //             gv = Session[$"GridView{GridNumber}"] as GridView;
+   //         } else
+			//{
+   //             gv = (GridView)divGridSection.FindControl($"gv{GridNumber}");
+   //         }
             
             string gridDataName = $"Grid{GridNumber}Datatable";
 
@@ -244,8 +244,8 @@ namespace VS2019CSharpGV472
 			{
 				// adding a row to a grid that contains a row, need to now fill the new dropdown list
 				DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                //DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
-                DropDownList productDDL = divGridSection.FindControl($"ddlProducts{GridNumber}") as DropDownList;
+                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
+                //DropDownList productDDL = divGridSection.FindControl($"ddlProducts{GridNumber}") as DropDownList;
 
                 // for which product id should the category dropdown be filled with
                 int forProductID = productDDL.SelectedIndex;
@@ -335,8 +335,8 @@ namespace VS2019CSharpGV472
             // find the number of rows that are in the table the gridview is connected to
             DataTable dt = Session[$"Grid{callingDDLNumber}Datatable"] as DataTable;
 
-            //GridView gv = (GridView)upGridViews.FindControl($"gv{callingDDLNumber}");
-            GridView gv = (GridView)divGridSection.FindControl($"gv{callingDDLNumber}");
+            GridView gv = (GridView)upGridViews.FindControl($"gv{callingDDLNumber}");
+            //GridView gv = (GridView)divGridSection.FindControl($"gv{callingDDLNumber}");
 
             DropDownList categoryDDL = gv.Rows[dt.Rows.Count-1].FindControl(fillCategoryDDLName) as DropDownList;
 

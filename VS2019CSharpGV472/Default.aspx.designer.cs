@@ -15,13 +15,13 @@ namespace VS2019CSharpGV472
 	{
 
 		/// <summary>
-		/// divGridSection control.
+		/// upGridViews control.
 		/// </summary>
 		/// <remarks>
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::System.Web.UI.HtmlControls.HtmlGenericControl divGridSection;
+		protected global::System.Web.UI.UpdatePanel upGridViews;
 
 		/// <summary>
 		/// btnAddRow1 control.
