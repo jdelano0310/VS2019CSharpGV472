@@ -79,7 +79,7 @@ namespace VS2019CSharpGV472
             }
 
             // for the certain productid
-            for (int p = 1; p <= ProductID; p++)
+            for (int p = ProductID; p <= ProductID; p++)
             {
                 for (int c = 1; c <= _categories.GetUpperBound(1); c++)
 				{
