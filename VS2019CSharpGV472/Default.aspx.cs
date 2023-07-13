@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace VS2019CSharpGV472
 {
@@ -89,6 +90,7 @@ namespace VS2019CSharpGV472
                 }
             }
 
+            ddlToFill.Enabled = true;
         }
         protected void GetCategories()
 		{
@@ -281,11 +283,12 @@ namespace VS2019CSharpGV472
             // create a new gridview section programmatically
 
             string newControlID; // used to create a new id for the programmatically created controls
+            DropDownList newProductDDL = null; // the new dropdown for product
 
             // increment the number of grids the page is displaying count
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
 
-            // new div
+            // new div where the new buttons, product dropdown and grid will be displayed
             HtmlGenericControl newDiv = new HtmlGenericControl("DIV");
             newDiv.ID = "divCopyMe" + Session["GridViewsCount"];
 
@@ -296,20 +299,49 @@ namespace VS2019CSharpGV472
                 Control newControl = (Control)Activator.CreateInstance(control.GetType());
                 newControlID = "";
                 if (control.ID != null)
-				{
+                {
                     // change the name so that the number in the names all match (this 'associates' the controls to each other)
-                    newControlID = control.ID.Substring(1, control.ID.Length - 1) + Session["GridViewsCount"];
+                    newControlID = control.ID.Substring(0, control.ID.Length - 1) + Session["GridViewsCount"];
+                }
+
+                if (control is HtmlControl)
+                {
+                    foreach (string key in ((HtmlControl)control).Attributes.Keys)
+                        ((HtmlControl)newControl).Attributes.Add(key, (string)((HtmlControl)control).Attributes[key]);
+                } else
+				{
+                    if (control is DropDownList)
+					{
+                        // when adding the new product dropdown get a reference to it
+                        newProductDDL = newControl as DropDownList;
+                    }
+                    foreach (PropertyInfo p in control.GetType().GetProperties())
+                    {
+                        // "InnerHtml/Text" are generated on the fly, so skip them. "Page" can be ignored, because it will be set when control is added to a Page.
+                        if (p.CanRead && p.CanWrite && p.Name != "InnerHtml" && p.Name != "InnerText" && p.Name != "Page")
+                        {
+                            try
+                            {
+                                p.SetValue(newControl, p.GetValue(control, p.GetIndexParameters()), p.GetIndexParameters());
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
                 }
                 newControl.ID = newControlID;
-                newControl.ClientIDMode = control.ClientIDMode;
-                newControl.Visible = control.Visible;
-                newControl.EnableViewState = control.EnableViewState;
-                newControl.ViewStateMode = control.ViewStateMode;
-                //newControl.Attributes["style"] = control.Attributes["style"];
                 newDiv.Controls.Add(newControl);
             }
 
-            upGridViews.Controls.Add(newDiv);
+            upGridViews.ContentTemplateContainer.Controls.Add(newDiv);
+
+            // fill the new prodcuts dropdown with the available selections
+            FillProductDropDown(newProductDDL);
+
+            // create a new table for the new grid
+            AddRowToDatatableForGrid(Session["GridViewsCount"].ToString());
+
         }
 
         protected void btnAddRow_Click(object sender, EventArgs e)
@@ -350,5 +382,6 @@ namespace VS2019CSharpGV472
             // call the routine that fills the category dropdown lists
             FillCategoryDropDown(categoryDDL, forProductID);
         }
-	}
+
+    }
 }
