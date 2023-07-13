@@ -39,14 +39,28 @@ namespace VS2019CSharpGV472
             else
             {
 
+                // if there are more than one in session, then recreate the controls
+                // for the grid
                 if ((int)Session["GridViewsCount"] > 1)
 				{
+                    if (Request.Form["__EVENTTARGET"].IndexOf("ddlProducts") > -1)
+                    {
+                        // the post back was caused by a products dropdown
+                        FindTheDDLValue();
+                    }
+
                     ReDisplayGridViews((int)Session["GridViewsCount"]);
                 }
                  
             }
         }
 
+        protected void FindTheDDLValue()
+		{
+            // look in the Request Form object for the value of the product dropdownlist
+            Int16 startingLocation = Request.Form.ToString().IndexOf(Session["GridViewsCount"].ToString() + "=");
+
+		}
         protected void FillProductDropDown(DropDownList ddlToFill)
 		{
             // use the saved array to fill the dropdownlist passed
@@ -303,7 +317,7 @@ namespace VS2019CSharpGV472
             btn = new Button();
             btn.ID = "btnAddGrid" + setNumber;
             btn.Text = "Add Grid";
-            btn.OnClientClick = "btnAddGrid_Click";
+            btn.Click += new EventHandler(this.btnAddGrid_Click);
             btn.UseSubmitBehavior = false;
 
             upGridViews.ContentTemplateContainer.Controls.Add(btn);
@@ -311,7 +325,7 @@ namespace VS2019CSharpGV472
             btn = new Button();
             btn.ID = "btnAddRow" + setNumber;
             btn.Text = "Add Row";
-            btn.OnClientClick = "btnAddRow_Click";
+            btn.Click += new EventHandler(this.btnAddRow_Click);
             btn.UseSubmitBehavior = false;
 
             upGridViews.ContentTemplateContainer.Controls.Add(btn);
