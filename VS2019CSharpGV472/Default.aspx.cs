@@ -278,11 +278,38 @@ namespace VS2019CSharpGV472
         }
         protected void btnAddGrid_Click(object sender, EventArgs e)
         {
-            // create a new gridview programmatically
+            // create a new gridview section programmatically
+
+            string newControlID; // used to create a new id for the programmatically created controls
+
+            // increment the number of grids the page is displaying count
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
 
-            HtmlInputGenericControl newDiv = new HtmlInputGenericControl("DIV");
-            newDiv.ID = $"divCopyMe" + Session["GridViewsCount"];
+            // new div
+            HtmlGenericControl newDiv = new HtmlGenericControl("DIV");
+            newDiv.ID = "divCopyMe" + Session["GridViewsCount"];
+
+            // copy all the controls from divCopyMe1 
+            // the div that contains the 2 buttons, product dropdown, and the gridview
+            foreach (Control control in divCopyMe1.Controls)
+            {
+                Control newControl = (Control)Activator.CreateInstance(control.GetType());
+                newControlID = "";
+                if (control.ID != null)
+				{
+                    // change the name so that the number in the names all match (this 'associates' the controls to each other)
+                    newControlID = control.ID.Substring(1, control.ID.Length - 1) + Session["GridViewsCount"];
+                }
+                newControl.ID = newControlID;
+                newControl.ClientIDMode = control.ClientIDMode;
+                newControl.Visible = control.Visible;
+                newControl.EnableViewState = control.EnableViewState;
+                newControl.ViewStateMode = control.ViewStateMode;
+                //newControl.Attributes["style"] = control.Attributes["style"];
+                newDiv.Controls.Add(newControl);
+            }
+
+            upGridViews.Controls.Add(newDiv);
         }
 
         protected void btnAddRow_Click(object sender, EventArgs e)
@@ -311,14 +338,16 @@ namespace VS2019CSharpGV472
             // find the number of rows that are in the table the gridview is connected to
             DataTable dt = Session[$"Grid{callingDDLNumber}Datatable"] as DataTable;
 
+            // get the gridview the products dropdown is associated with
             GridView gv = (GridView)upGridViews.FindControl($"gv{callingDDLNumber}");
-            //GridView gv = (GridView)divGridSection.FindControl($"gv{callingDDLNumber}");
 
+            // now get the category dropdown list in the last row of the gridview from above
             DropDownList categoryDDL = gv.Rows[dt.Rows.Count-1].FindControl(fillCategoryDDLName) as DropDownList;
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;
                         
+            // call the routine that fills the category dropdown lists
             FillCategoryDropDown(categoryDDL, forProductID);
         }
 	}
