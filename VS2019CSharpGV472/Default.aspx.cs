@@ -197,7 +197,8 @@ namespace VS2019CSharpGV472
                 dr = mytable.Rows[mytable.Rows.Count - 1];
 
                 // write last row from the grid to the previous row in the assiciated table
-                DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                //DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
                 TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount{GridNumber}") as TextBox;
                 //Label lblTaxAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"lblTaxAmount{GridNumber}") as Label;
                                 
@@ -235,7 +236,8 @@ namespace VS2019CSharpGV472
                 // re-populate the dropdown lists
                 foreach (GridViewRow gr in gv.Rows)
 				{
-                    DropDownList categoryDDL = gr.FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                    //DropDownList categoryDDL = gr.FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                    DropDownList categoryDDL = gr.FindControl("ddlCategory") as DropDownList;
                     FillCategoryDropDown(categoryDDL, forProductID);
 
                     if (gr.Cells[1].Text != "0")
@@ -252,14 +254,15 @@ namespace VS2019CSharpGV472
 			} else
 			{
                 // disable the drop down until the product is selected
-                DropDownList categoryDDL = gv.Rows[0].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                categoryDDL.Enabled = false;
+                //DropDownList categoryDDL = gv.Rows[0].FindControl($"ddlCategory{GridNumber}") as DropDownList;
+                //DropDownList categoryDDL = gv.Rows[0].FindControl("ddlCategory") as DropDownList;
+                //categoryDDL.Enabled = false;
             }
 
             //Session[$"GridView{GridNumber}"] = gv;
 
 			// udpate the panel (update panels stop the page from flashing)
-			//upGridViews.Update();
+			upGridViews.Update();
 
         }
 
@@ -292,12 +295,17 @@ namespace VS2019CSharpGV472
             HtmlGenericControl newDiv = new HtmlGenericControl("DIV");
             newDiv.ID = "divCopyMe" + Session["GridViewsCount"];
 
+            bool currentControlIsGridView = false;
+
             // copy all the controls from divCopyMe1 
             // the div that contains the 2 buttons, product dropdown, and the gridview
             foreach (Control control in divCopyMe1.Controls)
             {
                 Control newControl = (Control)Activator.CreateInstance(control.GetType());
                 newControlID = "";
+
+                currentControlIsGridView = control is GridView;
+
                 if (control.ID != null)
                 {
                     // change the name so that the number in the names all match (this 'associates' the controls to each other)
@@ -318,14 +326,6 @@ namespace VS2019CSharpGV472
                             newProductDDL = newControl as DropDownList;
                         }
 
-                    } else
-					{
-                        if (control is GridView)
-                        {
-                            // adding a new grid, change the name of the dropdown list in column 1
-                            GridView gv = (GridView)control;
-                            
-                        }
                     }
 
                     foreach (PropertyInfo p in control.GetType().GetProperties())
@@ -335,12 +335,29 @@ namespace VS2019CSharpGV472
                         {
                             try
                             {
-                                p.SetValue(newControl, p.GetValue(control, p.GetIndexParameters()), p.GetIndexParameters());
+                                if (currentControlIsGridView && p.Name.IndexOf("ID") > -1)
+								{
+                                    // this param is setting a name
+                                    string currentIDValue = (string)p.GetValue(control, p.GetIndexParameters());
+                                    currentIDValue.Replace("gv1", "gv" + Session["GridViewsCount"]);
+                                    p.SetValue(newControl, currentIDValue, p.GetIndexParameters());
+                                } else
+								{
+                                    p.SetValue(newControl, p.GetValue(control, p.GetIndexParameters()), p.GetIndexParameters());
+                                }
+                                
                             }
                             catch
                             {
                             }
                         }
+                    }
+
+                    if (control is GridView)
+                    {
+                        // adding a new grid, change the name of the dropdown list in column 1
+                        GridView gv = (GridView)newControl;
+
                     }
                 }
                 newControl.ID = newControlID;
@@ -378,7 +395,7 @@ namespace VS2019CSharpGV472
             string callingDDLNumber = callingDDL.ID.Substring(callingDDL.ID.Length - 1, 1);
 
             // calculate the category dropdown list to fill and find it on the page
-            string fillCategoryDDLName = $"ddlCategory{callingDDLNumber}";
+            //string fillCategoryDDLName = $"ddlCategory{callingDDLNumber}";
             
             // find the number of rows that are in the table the gridview is connected to
             DataTable dt = Session[$"Grid{callingDDLNumber}Datatable"] as DataTable;
@@ -387,7 +404,8 @@ namespace VS2019CSharpGV472
             GridView gv = (GridView)upGridViews.FindControl($"gv{callingDDLNumber}");
 
             // now get the category dropdown list in the last row of the gridview from above
-            DropDownList categoryDDL = gv.Rows[dt.Rows.Count-1].FindControl(fillCategoryDDLName) as DropDownList;
+            //DropDownList categoryDDL = gv.Rows[dt.Rows.Count-1].FindControl(fillCategoryDDLName) as DropDownList;
+            DropDownList categoryDDL = gv.Rows[dt.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;

@@ -21,7 +21,7 @@
                         <Columns>
                             <asp:TemplateField HeaderText="Category">
                                 <ItemTemplate>
-                                    <asp:DropDownList ID="ddlCategory1" runat="server">
+                                    <asp:DropDownList ID="ddlCategory" runat="server">
                                     </asp:DropDownList>
                                 </ItemTemplate>
                             </asp:TemplateField>
