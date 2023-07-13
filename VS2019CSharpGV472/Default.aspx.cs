@@ -312,9 +312,22 @@ namespace VS2019CSharpGV472
 				{
                     if (control is DropDownList)
 					{
-                        // when adding the new product dropdown get a reference to it
-                        newProductDDL = newControl as DropDownList;
+                        if (control.ID.IndexOf("Products") > -1)
+						{
+                            // when adding the new product dropdown get a reference to it
+                            newProductDDL = newControl as DropDownList;
+                        }
+
+                    } else
+					{
+                        if (control is GridView)
+                        {
+                            // adding a new grid, change the name of the dropdown list in column 1
+                            GridView gv = (GridView)control;
+                            
+                        }
                     }
+
                     foreach (PropertyInfo p in control.GetType().GetProperties())
                     {
                         // "InnerHtml/Text" are generated on the fly, so skip them. "Page" can be ignored, because it will be set when control is added to a Page.
