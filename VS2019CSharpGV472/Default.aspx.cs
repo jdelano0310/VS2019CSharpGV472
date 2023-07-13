@@ -326,10 +326,10 @@ namespace VS2019CSharpGV472
             // increment the number of grids the page is displaying count
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
 
-            CreateOneSet((string)Session["GridViewsCount"]);
+            CreateOneSet(Session["GridViewsCount"].ToString());
 
             // get a reference to the newly created products dropdown
-            newProductDDL = upGridViews.FindControl($"ddlProducts{(string)Session["GridViewsCount"]}") as DropDownList;
+            newProductDDL = upGridViews.FindControl($"ddlProducts{Session["GridViewsCount"].ToString()}") as DropDownList;
             FillProductDropDown(newProductDDL);
 
             // add a data table to the new grid
