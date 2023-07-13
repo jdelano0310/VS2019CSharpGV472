@@ -339,6 +339,8 @@ namespace VS2019CSharpGV472
 
         protected void CreateOneSet(string setNumber)
 		{
+            // this creates a new set of Add Row, Add Grid, Product Dropdown, and Gridview
+            // assigns them a number
             Button btn;
 
             btn = new Button();
