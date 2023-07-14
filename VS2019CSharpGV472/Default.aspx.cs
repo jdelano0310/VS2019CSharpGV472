@@ -132,12 +132,9 @@ namespace VS2019CSharpGV472
             }
 
             // for the certain productid
-            for (int p = ProductID; p <= ProductID; p++)
-            {
-                for (int c = 1; c <= _categories.GetUpperBound(1); c++)
-				{
-                    ddlToFill.Items.Insert(c, _categories[p, c]);
-                }
+            for (int c = 1; c <= _categories.GetUpperBound(1); c++)
+			{
+                ddlToFill.Items.Insert(c, _categories[ProductID, c]);
             }
 
             ddlToFill.Enabled = true;
@@ -340,7 +337,8 @@ namespace VS2019CSharpGV472
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
 
             CreateOneSet(Session["GridViewsCount"].ToString());
- 
+
+            upGridViews.Update();
         }
 
         protected void CreateOneSet(string setNumber)
