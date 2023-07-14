@@ -58,10 +58,20 @@ namespace VS2019CSharpGV472
                     }
 
                     ReDisplayGridViews((int)Session["GridViewsCount"]);
+
                 }
-                 
+
+                // look for any TextBoxes (txtAmount) and attach a JavaScript event to run the 
+                // calaculate Amount * 1.13
+                SetLostFocusEventOnAmountTextBoxes();
             }
         }
+
+        protected void SetLostFocusEventOnAmountTextBoxes()
+		{
+            // 
+		}
+
 
         protected void FindTheProductDDLValue()
 		{
@@ -257,11 +267,11 @@ namespace VS2019CSharpGV472
 
             Session[gridDataName] = mytable; // save the associated table (with the grid data) in session
 
-            if (gv.DataSource == null)
-            {
+            //if (gv.DataSource == null)
+            //{
                 gv.DataSource = mytable;
 				gv.DataBind();
-            }
+            //}
 
             if (Session[$"ddlProduct{GridNumber}SelectionIndex"] != null)
             {
@@ -410,11 +420,15 @@ namespace VS2019CSharpGV472
 
             // which button is calling - need this so you know which grid to add thw new row to
             Button callingBTN = sender as Button;
-            string callingBTNNumber = callingBTN.ID.Substring(callingBTN.ID.Length - 1, 1);
+            string callingBTNNumber = callingBTN.ID.Substring(callingBTN.ID.Length - 1);
 
             // add a new row to the associated gridview and table
             AddRowToDatatableForGrid(callingBTNNumber);
 
+            if (int.Parse(callingBTNNumber) > 1)
+			{
+                upGridViews.Update();
+			}
         }
 
 		protected void ddlProducts_SelectedIndexChanged(object sender, EventArgs e)
@@ -447,5 +461,5 @@ namespace VS2019CSharpGV472
             FillCategoryDropDown(categoryDDL, forProductID);
         }
 
-    }
+	}
 }

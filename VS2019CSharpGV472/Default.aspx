@@ -46,14 +46,4 @@
         </asp:updatepanel>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <asp:UpdatePanel ID="UpdatePanel1" UpdateMode="Conditional" runat="server">
-                <ContentTemplate>
-                    <asp:Label ID="lbGridCount" runat="server" Text="Grid Count: 1"></asp:Label>
-                </ContentTemplate>
-            </asp:UpdatePanel>
-        </div>
-    </div>
-
 </asp:Content>
