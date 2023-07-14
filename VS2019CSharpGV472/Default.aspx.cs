@@ -310,7 +310,7 @@ namespace VS2019CSharpGV472
 
             }
 
-            upGridViews.Update();
+            //upGridViews.Update();
             _reDisplayingPrevious = false;
         }
         class DropDownListColumn : ITemplate
