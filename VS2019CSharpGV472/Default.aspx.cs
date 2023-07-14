@@ -16,7 +16,7 @@ namespace VS2019CSharpGV472
         // hold the types so that a trip to the db isn't required on each new row
         private string[] _products;
         private string[,] _categories;
-        private bool _reDisplayingPrevious = false;
+        //private bool _reDisplayingPrevious = false;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -39,14 +39,19 @@ namespace VS2019CSharpGV472
             else
             {
 
-                // if there are more than one in session, then recreate the controls
+                // if there are more than one gridviews in session, then recreate the controls
                 // for the grid
                 if ((int)Session["GridViewsCount"] > 1)
 				{
                     if (Request.Form["__EVENTTARGET"].IndexOf("ddlProducts") > -1)
                     {
-                        // the post back was caused by a products dropdown
-                        FindTheDDLValue();
+                        // the post back was caused by a programmatically created products dropdown
+                        string ddlPostback = Request.Form["__EVENTTARGET"].ToString();
+                        ddlPostback = ddlPostback.Split(new string[] { "$" }, StringSplitOptions.None)[2];
+
+                        Session["DropDownListPostBack"] = ddlPostback;
+
+                        FindTheProductDDLValue();
                     }
 
                     ReDisplayGridViews((int)Session["GridViewsCount"]);
@@ -55,12 +60,36 @@ namespace VS2019CSharpGV472
             }
         }
 
-        protected void FindTheDDLValue()
+        protected void FindTheProductDDLValue()
 		{
             // look in the Request Form object for the value of the product dropdownlist
-            Int16 startingLocation = Request.Form.ToString().IndexOf(Session["GridViewsCount"].ToString() + "=");
+            string postbackDDL = Session["DropDownListPostBack"].ToString();
 
-		}
+            string postBackDDLValue = Request.Form.ToString().Substring(0, Request.Form.ToString().IndexOf("__EVENTTARGET")-1);
+            string[] postBackFormValues = postBackDDLValue.Split(new string[] { "%24" }, StringSplitOptions.None);
+
+            foreach (string fv in postBackFormValues)
+			{
+                if (fv.Contains(postbackDDL + "="))
+				{
+                    // take the value to the right of the equal sign
+                    postBackDDLValue = fv.Split(new string[] { "=" }, StringSplitOptions.None)[1];
+                    postBackDDLValue = postBackDDLValue.Split(new string[] { "&" }, StringSplitOptions.None)[0];
+                    break;
+                }
+			}
+
+            _products = (string[])Session["Products"];
+            for (int p = 1; p <= _products.GetUpperBound(0); p++)
+			{
+                if (_products[p] == postBackDDLValue)
+				{
+                    Session[$"{postbackDDL}SelectionIndex"] = p;
+                    break;
+                }
+			}
+            
+        }
         protected void FillProductDropDown(DropDownList ddlToFill)
 		{
             // use the saved array to fill the dropdownlist passed
@@ -339,9 +368,9 @@ namespace VS2019CSharpGV472
 
             FillProductDropDown(newProductDDL);
 
-            if (Session[$"ddlProduct{setNumber}SelectionIndex"] != null)
+            if (Session[$"ddlProducts{setNumber}SelectionIndex"] != null)
             {
-                newProductDDL.SelectedIndex = (Int16)Session[$"ddlProduct{setNumber}SelectionIndex"];
+                newProductDDL.SelectedIndex = (int)Session[$"ddlProducts{setNumber}SelectionIndex"];
             }
 
             GridView gv = new GridView();
