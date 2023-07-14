@@ -16,10 +16,12 @@ namespace VS2019CSharpGV472
         // hold the types so that a trip to the db isn't required on each new row
         private string[] _products;
         private string[,] _categories;
-        //private bool _reDisplayingPrevious = false;
+        private bool _reDisplayingPrevious = false;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
+            _reDisplayingPrevious = false;
 
             if (!IsPostBack) {
 
@@ -226,7 +228,7 @@ namespace VS2019CSharpGV472
 
                 dr = mytable.Rows[mytable.Rows.Count - 1];
 
-                // write last row from the grid to the previous row in the assiciated table
+                // write last row from the grid to the previous row in the associated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
                 TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
 
@@ -238,15 +240,19 @@ namespace VS2019CSharpGV472
                 dr["Amount"] = txtAmount.Text;
                 dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
                 //dr["DateCreated"] = DateTime.Now;
-
+                
             }
 
-            dr = mytable.NewRow();
-            dr["CategoryID"] = 0;
-            dr["Amount"] = 0;
-            dr["TaxAmount"] = 0;
-            //dr["DateCreated"] = DateTime.Now;
-            mytable.Rows.Add(dr);
+            if (!_reDisplayingPrevious)
+			{
+                // only add the row if this was not called to just redisplay what was already there
+                dr = mytable.NewRow();
+                dr["CategoryID"] = 0;
+                dr["Amount"] = 0;
+                dr["TaxAmount"] = 0;
+                //dr["DateCreated"] = DateTime.Now;
+                mytable.Rows.Add(dr);
+            }
 
             Session[gridDataName] = mytable;
 
@@ -256,22 +262,18 @@ namespace VS2019CSharpGV472
 				gv.DataBind();
             }
 
-			if (mytable.Rows.Count > 1)
-			{
-                // adding a row to a grid that contains a row, need to now fill the new dropdown list
+            if (Session[$"ddlProduct{GridNumber}SelectionIndex"] != null)
+            {
+                int forProductID = (int)Session[$"ddlProduct{GridNumber}SelectionIndex"];
 
-                // for which product id should the category dropdown be filled with
-                DropDownList productDDL = upGridViews.FindControl($"ddlProducts{GridNumber}") as DropDownList;
-                int forProductID = productDDL.SelectedIndex;
-
-                // re-populate the dropdown lists
+                // re-populate the dropdown lists or populate the first 
                 foreach (GridViewRow gr in gv.Rows)
-				{
+                {
                     DropDownList categoryDDL = gr.FindControl("ddlCategory") as DropDownList;
                     FillCategoryDropDown(categoryDDL, forProductID);
 
                     if (gr.Cells[1].Text != "0")
-					{
+                    {
                         // reselect the item that was selected before postback
                         categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
 
@@ -279,26 +281,17 @@ namespace VS2019CSharpGV472
                         TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
                         txtAmount.Enabled = false;
 
-                    } 
+                    }
                 }
-			} else
-			{
-                // disable the drop down until the product is selected
-                //DropDownList categoryDDL = gv.Rows[0].FindControl($"ddlCategory{GridNumber}") as DropDownList;
-                //DropDownList categoryDDL = gv.Rows[0].FindControl("ddlCategory") as DropDownList;
-                //categoryDDL.Enabled = false;
             }
-
-            //Session[$"GridView{GridNumber}"] = gv;
-
-			// udpate the panel (update panels stop the page from flashing)
-			//upGridViews.Update();
 
         }
 
         protected void ReDisplayGridViews(int gridViewCount)
         {
             // there are more than 1 grid views reporting to have existed
+            _reDisplayingPrevious = true;
+
             for (int gc = 2; gc <= gridViewCount; gc++)
 			{
                 CreateOneSet(gc.ToString());
@@ -404,6 +397,7 @@ namespace VS2019CSharpGV472
             upGridViews.ContentTemplateContainer.Controls.Add(gv);
 
             AddRowToDatatableForGrid(setNumber);
+            ddlProducts_SelectedIndexChanged(newProductDDL, null);
         }
 
 
