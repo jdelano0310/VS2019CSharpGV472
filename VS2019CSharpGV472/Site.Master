@@ -68,5 +68,32 @@
 
     </form>
 
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            // use jQuery to attach a lost focus event to all the txtAmount textboxes 
+            const boxes = document.querySelectorAll("[id*='txtAmount']");
+            console.log('found ' + boxes.length);
+
+            boxes.forEach(box => {
+                box.addEventListener('blur', function handleBlur(event) {
+                    // if there is a value entered then calculate the tax amount
+                    console.log('text lost focus ' + box.id);
+                    var boxAmount = box.value;
+
+                    console.log('value ' + box.boxAmount);
+                    if (boxAmount.length > 0) {
+                        if (parseFloat(boxAmount) > 0) {
+                            var taxAmount = parseFloat(boxAmount) * 1.13;
+                            console.log('taxAmount value ' + taxAmount);
+                            $(this).closest('td').next().html(taxAmount.toFixed(2));
+                        }
+                    }                    
+                });
+            });
+        });
+
+
+    </script>
 </body>
 </html>

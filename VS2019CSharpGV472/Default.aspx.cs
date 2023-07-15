@@ -441,6 +441,7 @@ namespace VS2019CSharpGV472
             bfield = new BoundField();
             bfield.DataField = "TaxAmount";
             bfield.HeaderText = "Tax Amount";
+            bfield.ItemStyle.Width = 100;
             gv.Columns.Add(bfield);
 
             upGridViews.ContentTemplateContainer.Controls.Add(gv);

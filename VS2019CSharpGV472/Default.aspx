@@ -34,7 +34,7 @@
                                     <asp:TextBox runat="server" ID="txtAmount" Text='<%# Eval("Amount") %>'></asp:TextBox>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" >
+                            <asp:BoundField  DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" >
                             <ItemStyle Width="100px" />
                             </asp:BoundField>
                         </Columns>
