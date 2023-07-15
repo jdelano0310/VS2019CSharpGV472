@@ -48,7 +48,7 @@ namespace VS2019CSharpGV472
                     if (Request.Form["__EVENTTARGET"].IndexOf("ddlProducts") > -1)
                     {
                         // the post back was caused by a programmatically created products dropdown
-                        // extract the value from the FORM viewstate *** there are BETTER ways to do this ***
+                        // findout which it was and place it in a session var for later use
                         string ddlPostback = Request.Form["__EVENTTARGET"].ToString();
                         ddlPostback = ddlPostback.Split(new string[] { "$" }, StringSplitOptions.None)[2];
 
@@ -76,6 +76,7 @@ namespace VS2019CSharpGV472
         protected void FindTheProductDDLValue()
 		{
             // look in the Request Form object for the value of the product dropdownlist
+            // extract the value from the FORM viewstate *** there are BETTER ways to do this ***
             string postbackDDL = Session["DropDownListPostBack"].ToString();
 
             string postBackDDLValue = Request.Form.ToString().Substring(0, Request.Form.ToString().IndexOf("__EVENTTARGET")-1);
@@ -124,6 +125,7 @@ namespace VS2019CSharpGV472
         protected void FillCategoryDropDown(DropDownList ddlToFill, int ProductID)
         {
             // use the saved array to fill the dropdownlist passed
+            ddlToFill.Items.Clear();
             ddlToFill.Items.Insert(0, "Select a Cateorgy");
 
             if (Session["Categories"] != null)
@@ -138,7 +140,6 @@ namespace VS2019CSharpGV472
             }
 
             ddlToFill.Enabled = true;
-            upGridViews.Update();
 
         }
         protected void GetCategories()
@@ -264,11 +265,9 @@ namespace VS2019CSharpGV472
 
             Session[gridDataName] = mytable; // save the associated table (with the grid data) in session
 
-            //if (gv.DataSource == null)
-            //{
-                gv.DataSource = mytable;
-				gv.DataBind();
-            //}
+            // reapply the binding
+            gv.DataSource = mytable;
+    		gv.DataBind();
 
             if (Session[$"ddlProduct{GridNumber}SelectionIndex"] != null)
             {
@@ -290,7 +289,7 @@ namespace VS2019CSharpGV472
                         TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
                         txtAmount.Enabled = false;
 
-                    }
+                    } 
                 }
             }
 
@@ -332,12 +331,46 @@ namespace VS2019CSharpGV472
 
         protected void btnAddGrid_Click(object sender, EventArgs e)
         {
+            if (Session["GridViewsCount"].ToString() == "1")
+            {
+                // run the Tax Amount calc on the current row of the initial gridview
+                // before adding a new grid
+                DataTable mytable = Session["Grid1Datatable"] as DataTable;
+                DataRow dr = mytable.Rows[mytable.Rows.Count - 1];
+
+                // write last row from the grid to the previous row in the associated table
+                DropDownList categoryDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+                TextBox txtAmount = gv1.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
+
+                // this happens when a new grid is added 
+                if (txtAmount.Text.Length == 0) txtAmount.Text = "0";
+
+                dr["ID"] = mytable.Rows.Count;
+                dr["CategoryID"] = categoryDDL.SelectedIndex;
+                dr["Amount"] = txtAmount.Text;
+                dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
+
+                Session["Grid1Datatable"] = mytable;
+
+                gv1.DataSource = mytable;
+                gv1.DataBind();
+
+                // have to reattach to the category dropdown list because it was recreated during the datasource
+                // assignment above
+                categoryDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+                FillCategoryDropDown(categoryDDL, (int)Session[$"ddlProduct1SelectionIndex"]);
+
+                categoryDDL.SelectedIndex = int.Parse(gv1.Rows[mytable.Rows.Count - 1].Cells[1].Text);
+            }
+
 
             // increment the number of grids the page is displaying count
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
 
+            // call the sub that will create the new section which contains a new grid
             CreateOneSet(Session["GridViewsCount"].ToString());
 
+            // update the updatepanel
             upGridViews.Update();
         }
 
@@ -348,17 +381,17 @@ namespace VS2019CSharpGV472
             Button btn;
 
             btn = new Button();
-            btn.ID = "btnAddGrid" + setNumber;
-            btn.Text = "Add Grid";
-            btn.Click += new EventHandler(this.btnAddGrid_Click);
+            btn.ID = "btnAddRow" + setNumber;
+            btn.Text = "Add Row";
+            btn.Click += new EventHandler(this.btnAddRow_Click);
             btn.UseSubmitBehavior = false;
 
             upGridViews.ContentTemplateContainer.Controls.Add(btn);
 
             btn = new Button();
-            btn.ID = "btnAddRow" + setNumber;
-            btn.Text = "Add Row";
-            btn.Click += new EventHandler(this.btnAddRow_Click);
+            btn.ID = "btnAddGrid" + setNumber;
+            btn.Text = "Add Grid";
+            btn.Click += new EventHandler(this.btnAddGrid_Click);
             btn.UseSubmitBehavior = false;
 
             upGridViews.ContentTemplateContainer.Controls.Add(btn);
@@ -423,6 +456,9 @@ namespace VS2019CSharpGV472
             // add a new row to the associated gridview and table
             AddRowToDatatableForGrid(callingBTNNumber);
 
+            // having a number greater than one assigned to the button that caused this event
+            // to trigger, means there are mulitple gridviews displayed on the page. 
+            // tell the update panel to, well, update to diplay their newest state
             if (int.Parse(callingBTNNumber) > 1)
 			{
                 upGridViews.Update();
@@ -445,9 +481,6 @@ namespace VS2019CSharpGV472
 
             // now get the category dropdown list in the last row of the gridview from above
             DropDownList categoryDDL = gv.Rows[dt.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
-
-            // clear any items that may be present
-            categoryDDL.Items.Clear();
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;
