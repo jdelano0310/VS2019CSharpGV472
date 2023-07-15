@@ -288,6 +288,7 @@ namespace VS2019CSharpGV472
 
                         // this has already been entered
                         TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
+                        txtAmount.Text = mytable.Rows[gr.RowIndex].ItemArray[2].ToString();
                         txtAmount.Enabled = false;
 
                     } 
@@ -304,66 +305,9 @@ namespace VS2019CSharpGV472
             for (int gc = 2; gc <= gridViewCount; gc++)
 			{
                 CreateOneSet(gc.ToString());
-                ReDisplayAmounts(gc.ToString());
             }
 
             _reDisplayingPrevious = false;
-        }
-
-        protected void ReDisplayAmounts(string GridNumber)
-		{
-            // look in the Request Form object for the values of the gridviews added progammatically
-            // extract them from the FORM viewstate *** there are BETTER ways to do this ***
-            string gridToFind = "gv" + GridNumber;
-            GridView gv = (GridView)upGridViews.FindControl(gridToFind);
-
-            string postBackData = Request.Form.ToString().Substring(0, Request.Form.ToString().IndexOf("__EVENTTARGET") - 1);
-            string[] postBackFormValues = postBackData.Split(new string[] { "%24" }, StringSplitOptions.None);
-
-            bool readGridData = false;
-            foreach (string fv in postBackFormValues)
-            {
-
-                if (readGridData && fv.StartsWith("gv") && fv != gridToFind)
-                {
-                    // another grid's data has been encountered leave the loop 
-                    break; 
-                }
-
-                if (readGridData)
-                {
-
-                    // take the value to the right of the equal sign
-                    if (fv.Contains("&"))
-                    {
-                        postBackData = fv.Split(new string[] { "=" }, StringSplitOptions.None)[1];
-                        switch (postBackData)
-                        {
-                            case "ddlCategory":
-                                // the dropdown cell - nothing is done with it
-                                break;
-                            case "CategoryID":
-                                // category id which is the selected index of the dropdownlist
-                                gv.Rows[0].Cells[1].Text = postBackData.Split(new string[] { "&" }, StringSplitOptions.None)[0];
-                                break;
-                            case "txtAmount":
-                                // amount entered - and use that to fill the Tax Amount cell
-                                if (postBackData.Length == 0) postBackData.Split(new string[] { "&" }, StringSplitOptions.None)[0] = "0";
-
-                                gv.Rows[0].Cells[2].Text = postBackData.Split(new string[] { "&" }, StringSplitOptions.None)[0];
-                                gv.Rows[0].Cells[3].Text = (float.Parse(postBackData.Split(new string[] { "&" }, StringSplitOptions.None)[0]) * 1.13).ToString();
-                                break;
-
-                        }
-                    }
-                }
-
-                // if we encounter this grid's data in the FORM data, set the flag
-                // to use it to fill the grid data in
-                if (fv == gridToFind) readGridData = true;
-
-            }
-
         }
 
         class DropDownListColumn : ITemplate
@@ -431,6 +375,7 @@ namespace VS2019CSharpGV472
 
             // update the updatepanel
             upGridViews.Update();
+            
         }
 
         protected void CreateOneSet(string setNumber)
