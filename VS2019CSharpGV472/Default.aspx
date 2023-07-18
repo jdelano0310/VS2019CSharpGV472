@@ -9,7 +9,7 @@
     <div class="row">
         <asp:updatepanel id="upGridViews" UpdateMode="Conditional" class="col-md-4" runat="server">
             <ContentTemplate>
-                <div id="divCopyMe1" runat="server">
+                <div id="divControlSet" runat="server">
                     <div class="row">
                         <asp:Button ID="btnAddRow1" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
                         <asp:Button ID="btnAddGrid1" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>

@@ -382,15 +382,25 @@ namespace VS2019CSharpGV472
 		{
             // this creates a new set of Add Row & Add Grid buttons, a Product Dropdown, and a Gridview
             // assigns them a number
-            Button btn;
 
+            // the div that surrounds each set of buttons / product dropdown and grid
+            Panel divCS = new Panel();
+            divCS.ID = "divControlSet" + setNumber;
+
+            // the div that surrounds the bottuns and product dropdown
+            Panel divBtnsAndDropdown = new Panel();
+            divBtnsAndDropdown.ID = "divBtnsAndGropdown" + setNumber;
+            divBtnsAndDropdown.CssClass = "row";
+
+            Button btn;
             btn = new Button();
             btn.ID = "btnAddRow" + setNumber;
             btn.Text = "Add Row";
             btn.Click += new EventHandler(this.btnAddRow_Click);
             btn.UseSubmitBehavior = false;
 
-            upGridViews.ContentTemplateContainer.Controls.Add(btn);
+            divBtnsAndDropdown.Controls.Add(btn);
+            //upGridViews.ContentTemplateContainer.Controls.Add(btn);
 
             btn = new Button();
             btn.ID = "btnAddGrid" + setNumber;
@@ -398,14 +408,16 @@ namespace VS2019CSharpGV472
             btn.Click += new EventHandler(this.btnAddGrid_Click);
             btn.UseSubmitBehavior = false;
 
-            upGridViews.ContentTemplateContainer.Controls.Add(btn);
+            divBtnsAndDropdown.Controls.Add(btn);
+            //upGridViews.ContentTemplateContainer.Controls.Add(btn);
 
             DropDownList newProductDDL = new DropDownList();
             newProductDDL.ID = "ddlProducts" + setNumber;
             newProductDDL.SelectedIndexChanged += new EventHandler(ddlProducts_SelectedIndexChanged);
             newProductDDL.AutoPostBack = true;
 
-            upGridViews.ContentTemplateContainer.Controls.Add(newProductDDL);
+            divBtnsAndDropdown.Controls.Add(newProductDDL);
+            //upGridViews.ContentTemplateContainer.Controls.Add(newProductDDL);
 
             FillProductDropDown(newProductDDL);
 
@@ -413,6 +425,8 @@ namespace VS2019CSharpGV472
             {
                 newProductDDL.SelectedIndex = (int)Session[$"ddlProducts{setNumber}SelectionIndex"];
             }
+
+            divControlSet.Controls.Add(divBtnsAndDropdown);
 
             GridView gv = new GridView();
             gv.ID = "gv" + setNumber;
@@ -444,7 +458,9 @@ namespace VS2019CSharpGV472
             bfield.ItemStyle.Width = 100;
             gv.Columns.Add(bfield);
 
-            upGridViews.ContentTemplateContainer.Controls.Add(gv);
+            divControlSet.Controls.Add(gv);
+            upGridViews.ContentTemplateContainer.Controls.Add(divControlSet);
+            //upGridViews.ContentTemplateContainer.Controls.Add(gv);
 
             AddRowToDatatableForGrid(setNumber);
             ddlProducts_SelectedIndexChanged(newProductDDL, null);

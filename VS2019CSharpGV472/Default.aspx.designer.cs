@@ -24,13 +24,13 @@ namespace VS2019CSharpGV472
 		protected global::System.Web.UI.UpdatePanel upGridViews;
 
 		/// <summary>
-		/// divCopyMe1 control.
+		/// divControlSet control.
 		/// </summary>
 		/// <remarks>
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::System.Web.UI.HtmlControls.HtmlGenericControl divCopyMe1;
+		protected global::System.Web.UI.HtmlControls.HtmlGenericControl divControlSet;
 
 		/// <summary>
 		/// btnAddRow1 control.
