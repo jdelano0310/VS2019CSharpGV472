@@ -61,17 +61,8 @@ namespace VS2019CSharpGV472
 
                 }
 
-                // look for any TextBoxes (txtAmount) and attach a JavaScript event to run the 
-                // calaculate Amount * 1.13
-                SetLostFocusEventOnAmountTextBoxes();
             }
         }
-
-        protected void SetLostFocusEventOnAmountTextBoxes()
-		{
-            // 
-		}
-
 
         protected void FindTheProductDDLValue()
 		{
@@ -238,6 +229,7 @@ namespace VS2019CSharpGV472
 
                 dr = mytable.Rows[mytable.Rows.Count - 1];
 
+                
                 // write last row from the grid to the previous row in the associated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
                 TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
@@ -297,10 +289,42 @@ namespace VS2019CSharpGV472
 
         }
 
+        protected void ReDisplayGrid1Rows()
+		{
+            //with GridView1 we just need to make sure all the rows have the dropdown displayed
+            DataTable mytable = Session["Grid1Datatable"] as DataTable;
+            GridView gv = (GridView)upGridViews.FindControl("gv1");
+
+            int forProductID = (int)Session["ddlProduct1SelectionIndex"];
+
+            // re-populate the dropdown lists or populate the first 
+            foreach (GridViewRow gr in gv.Rows)
+            {
+                DropDownList categoryDDL = gr.FindControl("ddlCategory") as DropDownList;
+                FillCategoryDropDown(categoryDDL, forProductID);
+
+                if (gr.Cells[1].Text != "0")
+                {
+                    // reselect the item that was selected before postback
+                    categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
+
+                    // this has already been entered
+                    TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
+                    txtAmount.Text = mytable.Rows[gr.RowIndex].ItemArray[2].ToString();
+                    txtAmount.Enabled = (txtAmount.Text == "0");  // the textbox is enabled if it contains "0"
+
+                }
+            }
+
+        }
+
         protected void ReDisplayGridViews(int gridViewCount)
         {
             // there are more than 1 grid views, recreate them
             _reDisplayingPrevious = true;
+
+            // with GridView1 we just need to make sure all the rows have the dropdown displayed
+            ReDisplayGrid1Rows();
 
             for (int gc = 2; gc <= gridViewCount; gc++)
 			{
@@ -358,14 +382,26 @@ namespace VS2019CSharpGV472
 
                 // have to reattach to the category dropdown list because it was recreated during the datasource
                 // assignment above
+                int selectedProductId = (int)Session[$"ddlProduct1SelectionIndex"];
                 categoryDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
-                FillCategoryDropDown(categoryDDL, (int)Session[$"ddlProduct1SelectionIndex"]);
+                FillCategoryDropDown(categoryDDL, selectedProductId);
 
                 // select the previously selected item using the data saved in the datatable that now
                 // resides in the second cell of the grid
                 categoryDDL.SelectedIndex = int.Parse(gv1.Rows[mytable.Rows.Count - 1].Cells[1].Text);
-            }
 
+                // make sure any other rows are still showing the proper category dropdown
+                if (mytable.Rows.Count > 1)
+                {
+                    for (int gv1rw = 0; gv1rw <= mytable.Rows.Count - 2; gv1rw++)
+                    {
+                        categoryDDL = gv1.Rows[gv1rw].FindControl("ddlCategory") as DropDownList;
+                        FillCategoryDropDown(categoryDDL, selectedProductId);
+                        categoryDDL.SelectedIndex = int.Parse(gv1.Rows[gv1rw].Cells[1].Text);
+                    }
+                }
+
+            }
 
             // increment the number of grids the page is displaying count
             Session["GridViewsCount"] = (int)Session["GridViewsCount"] + 1;
@@ -386,10 +422,11 @@ namespace VS2019CSharpGV472
             // the div that surrounds each set of buttons / product dropdown and grid
             Panel divCS = new Panel();
             divCS.ID = "divControlSet" + setNumber;
+            divCS.Attributes.Add("style", "margin-bottom: 10px");
 
             // the div that surrounds the bottuns and product dropdown
             Panel divBtnsAndDropdown = new Panel();
-            divBtnsAndDropdown.ID = "divBtnsAndGropdown" + setNumber;
+            divBtnsAndDropdown.ID = "divBtnsAndDropdown" + setNumber;
             divBtnsAndDropdown.CssClass = "row";
 
             Button btn;
@@ -426,7 +463,7 @@ namespace VS2019CSharpGV472
                 newProductDDL.SelectedIndex = (int)Session[$"ddlProducts{setNumber}SelectionIndex"];
             }
 
-            divControlSet.Controls.Add(divBtnsAndDropdown);
+            divCS.Controls.Add(divBtnsAndDropdown);
 
             GridView gv = new GridView();
             gv.ID = "gv" + setNumber;
@@ -455,11 +492,11 @@ namespace VS2019CSharpGV472
             bfield = new BoundField();
             bfield.DataField = "TaxAmount";
             bfield.HeaderText = "Tax Amount";
-            bfield.ItemStyle.Width = 100;
+            bfield.ItemStyle.Width = 200;
             gv.Columns.Add(bfield);
 
-            divControlSet.Controls.Add(gv);
-            upGridViews.ContentTemplateContainer.Controls.Add(divControlSet);
+            divCS.Controls.Add(gv);
+            upGridViews.ContentTemplateContainer.Controls.Add(divCS);
             //upGridViews.ContentTemplateContainer.Controls.Add(gv);
 
             AddRowToDatatableForGrid(setNumber);

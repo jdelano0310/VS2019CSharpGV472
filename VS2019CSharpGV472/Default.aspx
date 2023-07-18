@@ -9,7 +9,7 @@
     <div class="row">
         <asp:updatepanel id="upGridViews" UpdateMode="Conditional" class="col-md-4" runat="server">
             <ContentTemplate>
-                <div id="divControlSet" runat="server">
+                <asp:panel id="divControlSet" runat="server" style="margin-bottom: 10px">
                     <div class="row">
                         <asp:Button ID="btnAddRow1" runat="server" Text="Add Row" OnClick="btnAddRow_Click" usesubmitbehavior="false"/>
                         <asp:Button ID="btnAddGrid1" runat="server" Text="Add Grid" OnClick="btnAddGrid_Click" usesubmitbehavior="false"/>
@@ -35,12 +35,12 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <asp:BoundField  DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" >
-                            <ItemStyle Width="100px" />
+                            <ItemStyle Width="200px" />
                             </asp:BoundField>
                         </Columns>
                     
                     </asp:GridView>
-                </div>
+                </asp:panel>
                 <p></p>
             </ContentTemplate>
         </asp:updatepanel>

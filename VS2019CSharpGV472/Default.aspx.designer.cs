@@ -30,7 +30,7 @@ namespace VS2019CSharpGV472
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::System.Web.UI.HtmlControls.HtmlGenericControl divControlSet;
+		protected global::System.Web.UI.WebControls.Panel divControlSet;
 
 		/// <summary>
 		/// btnAddRow1 control.

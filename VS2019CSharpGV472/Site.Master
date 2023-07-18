@@ -58,6 +58,8 @@
             </div>
         </div>
         <div class="container body-content">
+            <p><span ID="txtStatus" runat="server">Status</span></p>
+
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
             <hr />
@@ -67,33 +69,63 @@
         </div>
 
     </form>
+</body>
 
-    <script type="text/javascript">
-        $(document).ready(function () {
+        <script type="text/javascript">
+            $(document).ready(function () {
 
-            // use jQuery to attach a lost focus event to all the txtAmount textboxes 
-            const boxes = document.querySelectorAll("[id*='txtAmount']");
-            console.log('found ' + boxes.length);
+                SetupAmountBlurEvent('document ready');
 
-            boxes.forEach(box => {
-                box.addEventListener('blur', function handleBlur(event) {
-                    // if there is a value entered then calculate the tax amount
-                    console.log('text lost focus ' + box.id);
-                    var boxAmount = box.value;
+                var prm = Sys.WebForms.PageRequestManager.getInstance();
+                prm.add_endRequest(function () {
+                    const boxes = document.querySelectorAll("[id*='txtAmount']");
+                    console.log('found ' + boxes.length.toString());
+                    $('#txtStatus').html('found ' + boxes.length.toString());
 
-                    console.log('value ' + box.boxAmount);
-                    if (boxAmount.length > 0) {
-                        if (parseFloat(boxAmount) > 0) {
-                            var taxAmount = parseFloat(boxAmount) * 1.13;
-                            console.log('taxAmount value ' + taxAmount);
-                            $(this).closest('td').next().html(taxAmount.toFixed(2));
-                        }
-                    }                    
+                    boxes.forEach(box => {
+                        box.addEventListener('blur', function handleBlur(event) {
+                            // if there is a value entered then calculate the tax amount
+                            console.log('text lost focus ' + box.id);
+
+                            var boxAmount = box.value;
+
+                            console.log('value ' + boxAmount);
+                            if (boxAmount.length > 0) {
+                                if (parseFloat(boxAmount) > 0) {
+                                    var taxAmount = parseFloat(boxAmount) * 1.13;
+                                    console.log('taxAmount value ' + taxAmount);
+                                    $(this).closest('td').next().html(taxAmount.toFixed(2));
+                                }
+                            }
+                        });
+                    });
                 });
             });
-        });
 
+            function SetupAmountBlurEvent(who_called) {
+                // use jQuery to attach a lost focus event to all the txtAmount textboxes 
+                const boxes = document.querySelectorAll("[id*='txtAmount']");
+                console.log('found ' + boxes.length.toString() + ' ' + who_called);
+                $('#txtStatus').html('found ' + boxes.length.toString() + ' ' + who_called);
 
-    </script>
-</body>
+                boxes.forEach(box => {
+                    box.addEventListener('blur', function handleBlur(event) {
+                        // if there is a value entered then calculate the tax amount
+                        console.log('text lost focus ' + box.id);
+
+                        var boxAmount = box.value;
+
+                        console.log('value ' + boxAmount);
+                        if (boxAmount.length > 0) {
+                            if (parseFloat(boxAmount) > 0) {
+                                var taxAmount = parseFloat(boxAmount) * 1.13;
+                                console.log('taxAmount value ' + taxAmount);
+                                $(this).closest('td').next().html(taxAmount.toFixed(2));
+                            }
+                        }
+                    });
+                });
+            }
+
+        </script>
 </html>
