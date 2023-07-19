@@ -289,42 +289,10 @@ namespace VS2019CSharpGV472
 
         }
 
-        protected void ReDisplayGrid1Rows()
-		{
-            //with GridView1 we just need to make sure all the rows have the dropdown displayed
-            DataTable mytable = Session["Grid1Datatable"] as DataTable;
-            GridView gv = (GridView)upGridViews.FindControl("gv1");
-
-            int forProductID = (int)Session["ddlProduct1SelectionIndex"];
-
-            // re-populate the dropdown lists or populate the first 
-            foreach (GridViewRow gr in gv.Rows)
-            {
-                DropDownList categoryDDL = gr.FindControl("ddlCategory") as DropDownList;
-                FillCategoryDropDown(categoryDDL, forProductID);
-
-                if (gr.Cells[1].Text != "0")
-                {
-                    // reselect the item that was selected before postback
-                    categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
-
-                    // this has already been entered
-                    TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
-                    txtAmount.Text = mytable.Rows[gr.RowIndex].ItemArray[2].ToString();
-                    txtAmount.Enabled = (txtAmount.Text == "0");  // the textbox is enabled if it contains "0"
-
-                }
-            }
-
-        }
-
         protected void ReDisplayGridViews(int gridViewCount)
         {
             // there are more than 1 grid views, recreate them
             _reDisplayingPrevious = true;
-
-            // with GridView1 we just need to make sure all the rows have the dropdown displayed
-            ReDisplayGrid1Rows();
 
             for (int gc = 2; gc <= gridViewCount; gc++)
 			{
