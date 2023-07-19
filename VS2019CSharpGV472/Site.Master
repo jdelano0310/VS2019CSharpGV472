@@ -72,12 +72,18 @@
 </body>
 
         <script type="text/javascript">
+            // you can view the console log output using F12 in the browser to 
+            // view the developer tools
             $(document).ready(function () {
-
+                // jQuery runs this the first time a page is loaded and is ready to be used
                 SetupAmountBlurEvent('document ready');
 
                 var prm = Sys.WebForms.PageRequestManager.getInstance();
                 prm.add_endRequest(function () {
+                    // this is attaching to the event that fires when a page update
+                    // is requested, the attachment to the blue event for the textboxes
+                    // has to be reapplied each time because they aren't "really"
+                    // in the page having been added via code
                     const boxes = document.querySelectorAll("[id*='txtAmount']");
                     console.log('found ' + boxes.length.toString());
                     $('#txtStatus').html('found ' + boxes.length.toString());
