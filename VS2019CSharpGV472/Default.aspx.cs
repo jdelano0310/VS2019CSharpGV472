@@ -228,8 +228,7 @@ namespace VS2019CSharpGV472
                 mytable = Session[$"Grid{GridNumber}Datatable"] as DataTable;
 
                 dr = mytable.Rows[mytable.Rows.Count - 1];
-
-                
+                                
                 // write last row from the grid to the previous row in the associated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
                 TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
@@ -382,59 +381,60 @@ namespace VS2019CSharpGV472
             
         }
 
-        protected void CreateOneSet(string setNumber)
+        protected void CreateOneSet(string ForGridViewNumber)
 		{
             // this creates a new set of Add Row & Add Grid buttons, a Product Dropdown, and a Gridview
             // assigns them a number
 
             // the div that surrounds each set of buttons / product dropdown and grid
             Panel divCS = new Panel();
-            divCS.ID = "divControlSet" + setNumber;
+            divCS.ID = "divControlSet" + ForGridViewNumber;
             divCS.Attributes.Add("style", "margin-bottom: 10px");
 
             // the div that surrounds the bottuns and product dropdown
             Panel divBtnsAndDropdown = new Panel();
-            divBtnsAndDropdown.ID = "divBtnsAndDropdown" + setNumber;
+            divBtnsAndDropdown.ID = "divBtnsAndDropdown" + ForGridViewNumber;
             divBtnsAndDropdown.CssClass = "row";
 
             Button btn;
             btn = new Button();
-            btn.ID = "btnAddRow" + setNumber;
+            btn.ID = "btnAddRow" + ForGridViewNumber;
             btn.Text = "Add Row";
             btn.Click += new EventHandler(this.btnAddRow_Click);
             btn.UseSubmitBehavior = false;
 
             divBtnsAndDropdown.Controls.Add(btn);
-            //upGridViews.ContentTemplateContainer.Controls.Add(btn);
 
             btn = new Button();
-            btn.ID = "btnAddGrid" + setNumber;
+            btn.ID = "btnAddGrid" + ForGridViewNumber;
             btn.Text = "Add Grid";
             btn.Click += new EventHandler(this.btnAddGrid_Click);
             btn.UseSubmitBehavior = false;
 
             divBtnsAndDropdown.Controls.Add(btn);
-            //upGridViews.ContentTemplateContainer.Controls.Add(btn);
 
+            // create a new product dropdownlist for the new gridview
             DropDownList newProductDDL = new DropDownList();
-            newProductDDL.ID = "ddlProducts" + setNumber;
+            newProductDDL.ID = "ddlProducts" + ForGridViewNumber;
             newProductDDL.SelectedIndexChanged += new EventHandler(ddlProducts_SelectedIndexChanged);
             newProductDDL.AutoPostBack = true;
 
             divBtnsAndDropdown.Controls.Add(newProductDDL);
-            //upGridViews.ContentTemplateContainer.Controls.Add(newProductDDL);
 
             FillProductDropDown(newProductDDL);
 
-            if (Session[$"ddlProducts{setNumber}SelectionIndex"] != null)
+            // if there is a selection saved in session for the dropdownlist created
+            // reselect the item
+            if (Session[$"ddlProducts{ForGridViewNumber}SelectionIndex"] != null)
             {
-                newProductDDL.SelectedIndex = (int)Session[$"ddlProducts{setNumber}SelectionIndex"];
+                newProductDDL.SelectedIndex = (int)Session[$"ddlProducts{ForGridViewNumber}SelectionIndex"];
             }
 
             divCS.Controls.Add(divBtnsAndDropdown);
 
+            // new gridview
             GridView gv = new GridView();
-            gv.ID = "gv" + setNumber;
+            gv.ID = "gv" + ForGridViewNumber;
             gv.AutoGenerateColumns = false;
 
             TemplateField tfield;
@@ -465,9 +465,8 @@ namespace VS2019CSharpGV472
 
             divCS.Controls.Add(gv);
             upGridViews.ContentTemplateContainer.Controls.Add(divCS);
-            //upGridViews.ContentTemplateContainer.Controls.Add(gv);
-
-            AddRowToDatatableForGrid(setNumber);
+            
+            AddRowToDatatableForGrid(ForGridViewNumber);
             ddlProducts_SelectedIndexChanged(newProductDDL, null);
         }
 
