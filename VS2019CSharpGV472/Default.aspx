@@ -37,6 +37,16 @@
                             <asp:BoundField  DataField="TaxAmount" HeaderText="Tax Amount" ReadOnly="True" >
                             <ItemStyle Width="200px" />
                             </asp:BoundField>
+                            <asp:BoundField DataField="SelectedMarkUpType" ReadOnly="True" >
+                                <HeaderStyle Width="0px" />
+                                <ItemStyle Width="0px" Font-Size="0pt" />
+                            </asp:BoundField>
+                            <asp:TemplateField HeaderText="Markup Type">
+                                <ItemTemplate>
+                                    <asp:DropDownList ID="ddlMarkUpType" runat="server">
+                                    </asp:DropDownList>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                         </Columns>
                     
                     </asp:GridView>

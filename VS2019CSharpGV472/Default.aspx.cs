@@ -16,6 +16,7 @@ namespace VS2019CSharpGV472
         // hold the types so that a trip to the db isn't required on each new row
         private string[] _products;
         private string[,] _categories;
+        private string[] _markUpTypes = { "%", "$" };
         private bool _reDisplayingPrevious = false;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -36,6 +37,7 @@ namespace VS2019CSharpGV472
                 // save the arrays in a session var
                 Session["Products"] = _products;
                 Session["Categories"] = _categories;
+                Session["MarkUpTypes"] = _markUpTypes;
 
             }
             else
@@ -134,6 +136,29 @@ namespace VS2019CSharpGV472
             ddlToFill.Enabled = true;
 
         }
+
+        protected void FillMarkUpTypesDropDown(DropDownList ddlToFill)
+        {
+            int itemCount = 0;
+
+            // use the saved array to fill the dropdownlist passed
+            ddlToFill.Items.Clear();
+            ddlToFill.Items.Insert(0, " Select a Markup");
+
+            if (Session["MarkUpTypes"] != null)
+            {
+                _markUpTypes = (string[])Session["MarkUpTypes"];
+            }
+
+            foreach (string item in _markUpTypes)
+            {
+                itemCount += 1;
+                if (item != null) { ddlToFill.Items.Insert(itemCount - 1, item); }
+            }
+
+            ddlToFill.Enabled = true;
+
+        }
         protected void GetCategories()
 		{
             // grab the dropdown contents for the categories dropdown
@@ -221,7 +246,7 @@ namespace VS2019CSharpGV472
                 mytable.Columns.Add("CategoryID", typeof(Int16));
                 mytable.Columns.Add("Amount", typeof(float));
                 mytable.Columns.Add("TaxAmount", typeof(float));
-                mytable.Columns.Add("DateCreated", typeof(DateTime));
+                mytable.Columns.Add("SelectedMarkupType", typeof(Int16));
             } else
 			{
                 // else use the one that exists already
@@ -231,6 +256,7 @@ namespace VS2019CSharpGV472
                                 
                 // write last row from the grid to the previous row in the associated table
                 DropDownList categoryDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+                DropDownList MarkupTypeDDL = gv.Rows[mytable.Rows.Count - 1].FindControl("ddlMarkUpType") as DropDownList;
                 TextBox txtAmount = gv.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
 
                 // this happens when a new grid is added 
@@ -240,8 +266,8 @@ namespace VS2019CSharpGV472
                 dr["CategoryID"] = categoryDDL.SelectedIndex;
                 dr["Amount"] = txtAmount.Text;
                 dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
-                //dr["DateCreated"] = DateTime.Now;
-                
+                dr["SelectedMarkUpType"] = MarkupTypeDDL.SelectedIndex;
+
             }
 
             if (!_reDisplayingPrevious)
@@ -251,7 +277,7 @@ namespace VS2019CSharpGV472
                 dr["CategoryID"] = 0;
                 dr["Amount"] = 0;
                 dr["TaxAmount"] = 0;
-                //dr["DateCreated"] = DateTime.Now;
+                dr["SelectedMarkUpType"] = 0;
                 mytable.Rows.Add(dr);
             }
 
@@ -270,12 +296,16 @@ namespace VS2019CSharpGV472
                 foreach (GridViewRow gr in gv.Rows)
                 {
                     DropDownList categoryDDL = gr.FindControl("ddlCategory") as DropDownList;
+                    DropDownList MarkupTypeDDL = gr.FindControl("ddlMarkUpType") as DropDownList;
+
                     FillCategoryDropDown(categoryDDL, forProductID);
+                    FillMarkUpTypesDropDown(MarkupTypeDDL);
 
                     if (gr.Cells[1].Text != "0")
                     {
                         // reselect the item that was selected before postback
                         categoryDDL.SelectedIndex = int.Parse(gr.Cells[1].Text);
+                        MarkupTypeDDL.SelectedIndex = int.Parse(gr.Cells[4].Text);
 
                         // this has already been entered
                         TextBox txtAmount = gr.FindControl($"txtAmount") as TextBox;
@@ -301,12 +331,22 @@ namespace VS2019CSharpGV472
             _reDisplayingPrevious = false;
         }
 
-        class DropDownListColumn : ITemplate
+        class categoryDropDownList : ITemplate
         {
             public void InstantiateIn(System.Web.UI.Control container)
             {
                 DropDownList ddl = new DropDownList();
                 ddl.ID = "ddlCategory";
+                container.Controls.Add(ddl);
+            }
+        }
+
+        class MarkupTypeDropDownList : ITemplate
+        {
+            public void InstantiateIn(System.Web.UI.Control container)
+            {
+                DropDownList ddl = new DropDownList();
+                ddl.ID = "ddlMarkUpType";
                 container.Controls.Add(ddl);
             }
         }
@@ -332,6 +372,7 @@ namespace VS2019CSharpGV472
 
                 // write last row from the grid to the previous row in the associated table
                 DropDownList categoryDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+                DropDownList MarkupTypeDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlMarkUpType") as DropDownList;
                 TextBox txtAmount = gv1.Rows[mytable.Rows.Count - 1].FindControl($"txtAmount") as TextBox;
 
                 // this happens when a new grid is added 
@@ -339,6 +380,7 @@ namespace VS2019CSharpGV472
 
                 dr["ID"] = mytable.Rows.Count;
                 dr["CategoryID"] = categoryDDL.SelectedIndex;
+                dr["SelectedMarkupType"] = MarkupTypeDDL.SelectedIndex;
                 dr["Amount"] = txtAmount.Text;
                 dr["TaxAmount"] = float.Parse(txtAmount.Text) * 1.13;
 
@@ -351,11 +393,15 @@ namespace VS2019CSharpGV472
                 // assignment above
                 int selectedProductId = (int)Session[$"ddlProduct1SelectionIndex"];
                 categoryDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+                MarkupTypeDDL = gv1.Rows[mytable.Rows.Count - 1].FindControl("ddlMarkUpType") as DropDownList;
+
                 FillCategoryDropDown(categoryDDL, selectedProductId);
+                FillMarkUpTypesDropDown(MarkupTypeDDL);
 
                 // select the previously selected item using the data saved in the datatable that now
                 // resides in the second cell of the grid
                 categoryDDL.SelectedIndex = int.Parse(gv1.Rows[mytable.Rows.Count - 1].Cells[1].Text);
+                MarkupTypeDDL.SelectedIndex = int.Parse(gv1.Rows[mytable.Rows.Count - 1].Cells[4].Text);
 
                 // make sure any other rows are still showing the proper category dropdown
                 if (mytable.Rows.Count > 1)
@@ -363,8 +409,13 @@ namespace VS2019CSharpGV472
                     for (int gv1rw = 0; gv1rw <= mytable.Rows.Count - 2; gv1rw++)
                     {
                         categoryDDL = gv1.Rows[gv1rw].FindControl("ddlCategory") as DropDownList;
+                        MarkupTypeDDL = gv1.Rows[gv1rw].FindControl("ddlMarkUpType") as DropDownList;
+
                         FillCategoryDropDown(categoryDDL, selectedProductId);
                         categoryDDL.SelectedIndex = int.Parse(gv1.Rows[gv1rw].Cells[1].Text);
+
+                        FillMarkUpTypesDropDown(MarkupTypeDDL);
+                        MarkupTypeDDL.SelectedIndex = int.Parse(gv1.Rows[gv1rw].Cells[4].Text);
                     }
                 }
 
@@ -443,7 +494,7 @@ namespace VS2019CSharpGV472
             // add the template fields
             tfield = new TemplateField();
             tfield.HeaderText = "Category";
-            tfield.ItemTemplate = new DropDownListColumn();
+            tfield.ItemTemplate = new categoryDropDownList();
             gv.Columns.Add(tfield);
 
             bfield = new BoundField();
@@ -462,6 +513,11 @@ namespace VS2019CSharpGV472
             bfield.HeaderText = "Tax Amount";
             bfield.ItemStyle.Width = 200;
             gv.Columns.Add(bfield);
+
+            tfield = new TemplateField();
+            tfield.HeaderText = "MarkUp Type";
+            tfield.ItemTemplate = new MarkupTypeDropDownList();
+            gv.Columns.Add(tfield);
 
             divCS.Controls.Add(gv);
             upGridViews.ContentTemplateContainer.Controls.Add(divCS);
@@ -506,6 +562,7 @@ namespace VS2019CSharpGV472
 
             // now get the category dropdown list in the last row of the gridview from above
             DropDownList categoryDDL = gv.Rows[dt.Rows.Count - 1].FindControl("ddlCategory") as DropDownList;
+            DropDownList markUpTypeDDL = gv.Rows[dt.Rows.Count - 1].FindControl("ddlMarkUpType") as DropDownList;
 
             // for which product id should the category dropdown be filled with
             int forProductID = callingDDL.SelectedIndex;
@@ -515,6 +572,7 @@ namespace VS2019CSharpGV472
 
             // call the routine that fills the category dropdown lists
             FillCategoryDropDown(categoryDDL, forProductID);
+            FillMarkUpTypesDropDown(markUpTypeDDL);
         }
 
 	}
