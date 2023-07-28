@@ -514,6 +514,12 @@ namespace VS2019CSharpGV472
             bfield.ItemStyle.Width = 200;
             gv.Columns.Add(bfield);
 
+            bfield = new BoundField();
+            bfield.DataField = "SelectedMarkUpType";
+            bfield.HeaderText = "";
+            bfield.ItemStyle.Font.Size = 0;
+            gv.Columns.Add(bfield);
+
             tfield = new TemplateField();
             tfield.HeaderText = "MarkUp Type";
             tfield.ItemTemplate = new MarkupTypeDropDownList();
