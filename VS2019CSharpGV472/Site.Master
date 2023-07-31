@@ -93,15 +93,28 @@
                             // if there is a value entered then calculate the tax amount
                             console.log('text lost focus ' + box.id);
 
-                            var boxAmount = box.value;
+                            var taxAmount = CalculateTaxAmount(box);
 
-                            console.log('value ' + boxAmount);
-                            if (boxAmount.length > 0) {
-                                if (parseFloat(boxAmount) > 0) {
-                                    var taxAmount = parseFloat(boxAmount) * 1.13;
-                                    console.log('taxAmount value ' + taxAmount);
-                                    $(this).closest('td').next().html(taxAmount.toFixed(2));
-                                }
+                            // this tells jQuery to place the value in the next table cell
+                            // to the right of the amount textbox
+                            $(this).closest('td').next().html(taxAmount.toFixed(2));
+
+                        });
+                        box.addEventListener('keypress', function handleEnter(event) {
+                            console.log('a key was pressed ' + event.which);
+
+                            if (event.which == 13) {
+                                console.log('enter key was pressed');
+
+                                //the enter key was pressed in the textbox
+                                var taxAmount = CalculateTaxAmount(box);
+
+                                // this tells jQuery to place the value in the next table cell 
+                                // to the right of the amount textbox
+                                $(this).closest('td').next().html(taxAmount.toFixed(2));
+
+                                // this prevents the enter key from causing a postback
+                                event.preventDefault();
                             }
                         });
                     });
@@ -119,19 +132,49 @@
                         // if there is a value entered then calculate the tax amount
                         console.log('text lost focus ' + box.id);
 
-                        var boxAmount = box.value;
+                        var taxAmount = CalculateTaxAmount(box);
 
-                        console.log('value ' + boxAmount);
-                        if (boxAmount.length > 0) {
-                            if (parseFloat(boxAmount) > 0) {
-                                var taxAmount = parseFloat(boxAmount) * 1.13;
-                                console.log('taxAmount value ' + taxAmount);
-                                $(this).closest('td').next().html(taxAmount.toFixed(2));
-                            }
+                        // this tells jQuery to place the value in the next table cell
+                        // to the right of the amount textbox
+                        $(this).closest('td').next().html(taxAmount.toFixed(2));
+
+                    });
+                    box.addEventListener('keypress', function handleEnter(event) {
+                        console.log('a key was pressed ' + event.which);
+
+                        if (event.which == 13) {
+                            console.log('enter key was pressed');
+
+                            //the enter key was pressed in the textbox
+                            var taxAmount = CalculateTaxAmount(box);
+
+                            // this tells jQuery to place the value in the next table cell 
+                            // to the right of the amount textbox
+                            $(this).closest('td').next().html(taxAmount.toFixed(2));
+
+                            // this prevents the enter key from causing a postback
+                            event.preventDefault();
                         }
                     });
                 });
             }
 
+            function CalculateTaxAmount(txtAmount) {
+
+                // do the actual calc here
+                var boxAmount = txtAmount.value;
+                var taxAmount = 0;
+
+                console.log('value ' + boxAmount);
+                if (boxAmount.length > 0) {
+                    if (parseFloat(boxAmount) > 0) {
+                        taxAmount = parseFloat(boxAmount) * 1.13;
+                        console.log('taxAmount value ' + taxAmount);
+                    }
+                }
+
+                return taxAmount;
+
+            }
         </script>
 </html>
